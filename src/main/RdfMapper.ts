@@ -36,9 +36,6 @@ export class RdfMapper {
         });
 
         return result;
-
-
-        // return Reflect.getMetadata('RdfProperty', target);
     }
 
     public static getN3NsPrefixObject(ns: IRdfNamespaces[]) {
