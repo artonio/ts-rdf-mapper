@@ -1,4 +1,3 @@
-import * as N3 from 'n3';
 import 'reflect-metadata';
 import {RdfBean} from '../main/annotations/RdfBean';
 import {RdfNamespaces} from '../main/annotations/RdfNamespaces';

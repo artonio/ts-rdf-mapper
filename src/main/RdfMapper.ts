@@ -1,7 +1,7 @@
 import * as N3 from 'n3';
 import 'reflect-metadata';
 import {IRdfNamespaces} from './annotations/interfaces/IRdfNamespaces';
-import {consoleTestResultHandler} from 'tslint/lib/test';
+import {IRdfPropertyMetadata} from './annotations/interfaces/IRdfPropertyMetadata';
 
 export class RdfMapper {
     public static serialize(target: any) {
@@ -21,13 +21,12 @@ export class RdfMapper {
             namedNode(beanType)
         );
 
-        const properties: Array<any> = Reflect.getMetadata('RdfProperty', target);
-        properties.forEach(p => {
-
+        const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', target);
+        properties.forEach((p: IRdfPropertyMetadata) => {
             const q = quad(
                 namedNode(`person:${subject['val']}`),
-                namedNode(p.prop.prop),
-                literal(p.val, {value: p.prop.xsdType})
+                namedNode(p.decoratorMetadata.prop),
+                literal(p.val, {value: p.decoratorMetadata.xsdType})
             );
 
             writer.addQuad(
