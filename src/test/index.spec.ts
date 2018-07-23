@@ -25,11 +25,20 @@ describe('Testing basic serialization functions', () => {
             @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})
             public gender: string;
 
+            @RdfProperty({prop: 'person:age', xsdType: XSDDataType.XSD_INT})
+            public age: number;
+
             @RdfProperty({prop: 'person:isAdult', xsdType: XSDDataType.XSD_BOOLEAN})
             public isAdult: boolean;
 
-            @RdfProperty({prop: 'person:weight', xsdType: XSDDataType.XSD_LONG})
+            @RdfProperty({prop: 'person:weight', xsdType: XSDDataType.XSD_DOUBLE})
             public weight: number;
+
+            @RdfProperty({prop: 'person:height', xsdType: XSDDataType.XSD_LONG})
+            public height: number;
+
+            @RdfProperty({prop: 'person:buoyancy', xsdType: XSDDataType.XSD_FLOAT})
+            public buoyancy: number;
 
         }
 
@@ -37,8 +46,11 @@ describe('Testing basic serialization functions', () => {
         p.uuid = '123345dfx';
         p.name = 'Anton';
         p.gender = 'M';
+        p.age = 32;
         p.isAdult = true;
         p.weight = 95.5;
+        p.height = 198.5;
+        p.buoyancy = 53.2;
 
         const b = RdfMapper.serialize(p);
         console.log(b);

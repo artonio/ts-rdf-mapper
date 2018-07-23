@@ -34,7 +34,7 @@ export class RdfMapper {
                q
             );
 
-            console.log(q.object.datatype.value)
+            // console.log(q.object.datatype.value)
         });
 
 
