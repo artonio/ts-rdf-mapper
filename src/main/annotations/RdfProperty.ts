@@ -23,15 +23,6 @@ export const RdfProperty = (prop: IRdfProperty) => {
             s.push({key: key, val: value, prop: prop});
             // Define or redefine metadata for current target
             Reflect.defineMetadata('RdfProperty', s, target);
-            // const writer = N3.Writer({ prefixes: { c: 'http://example.org/cartoons#' } });
-            // const { DataFactory } = N3;
-            // const { namedNode, literal, defaultGraph, quad } = DataFactory;
-            // writer.addQuad(
-            //     namedNode('http://example.org/cartoons#Tom'),
-            //     namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            //     namedNode('http://example.org/cartoons#Cat')
-            // );
-            // writer.end((error, result) => console.log(result));
         };
 
         if (delete target[key]) {
