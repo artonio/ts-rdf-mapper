@@ -1,10 +1,10 @@
 import * as N3 from 'n3';
 import 'reflect-metadata';
 import {IRdfNamespaces} from './annotations/interfaces/IRdfNamespaces';
+import {consoleTestResultHandler} from 'tslint/lib/test';
 
 export class RdfMapper {
     public static serialize(target: any) {
-
         const ns: IRdfNamespaces[] = Reflect.getMetadata('RdfNamespaces', target);
         const beanType: string = Reflect.getMetadata('RdfBean', target);
         const subject: string = Reflect.getMetadata('RdfSubject', target);
@@ -23,12 +23,20 @@ export class RdfMapper {
 
         const properties: Array<any> = Reflect.getMetadata('RdfProperty', target);
         properties.forEach(p => {
-            writer.addQuad(
+
+            const q = quad(
                 namedNode(`person:${subject['val']}`),
                 namedNode(p.prop.prop),
-                literal(p.val)
+                literal(p.val, {value: p.prop.xsdType})
             );
+
+            writer.addQuad(
+               q
+            );
+
+            console.log(q.object.datatype.value)
         });
+
 
         let result;
         writer.end((error, r) => {
@@ -36,6 +44,11 @@ export class RdfMapper {
         });
 
         return result;
+    }
+
+    public static deserialize <T>(type: { new(): T }, ttlData: string): T {
+        const dtoInstance = new type();
+        return dtoInstance;
     }
 
     public static getN3NsPrefixObject(ns: IRdfNamespaces[]) {

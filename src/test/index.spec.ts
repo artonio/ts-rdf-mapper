@@ -1,3 +1,4 @@
+import * as N3 from 'n3';
 import 'reflect-metadata';
 import {RdfBean} from '../main/annotations/RdfBean';
 import {RdfNamespaces} from '../main/annotations/RdfNamespaces';
@@ -24,15 +25,31 @@ describe('Testing basic serialization functions', () => {
             @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})
             public gender: string;
 
+            @RdfProperty({prop: 'person:isAdult', xsdType: XSDDataType.XSD_BOOLEAN})
+            public isAdult: boolean;
+
+            @RdfProperty({prop: 'person:weight', xsdType: XSDDataType.XSD_LONG})
+            public weight: number;
+
         }
 
         const p = new Person();
         p.uuid = '123345dfx';
         p.name = 'Anton';
         p.gender = 'M';
+        p.isAdult = true;
+        p.weight = 95.5;
 
         const b = RdfMapper.serialize(p);
         console.log(b);
+
+        // const parser = new N3.Parser();
+        // parser.parse(b, (error, quad, prefixes) => {
+        //     if (quad)
+        //         console.log(quad);
+        //     else
+        //         console.log('# That\'s all, folks!', prefixes);
+        // });
 
     });
 
