@@ -1,48 +1,11 @@
-import * as N3 from 'n3';
 import 'reflect-metadata';
 import {IRdfNamespaces} from './annotations/interfaces/IRdfNamespaces';
-import {IRdfPropertyMetadata} from './annotations/interfaces/IRdfPropertyMetadata';
+import {SerializerProcessor} from './processors/SerializerProcessor';
 
 export class RdfMapper {
     public static serialize(target: any) {
-        const ns: IRdfNamespaces[] = Reflect.getMetadata('RdfNamespaces', target);
-        const beanType: string = Reflect.getMetadata('RdfBean', target);
-        const subject: string = Reflect.getMetadata('RdfSubject', target);
-        // console.log(ns);
-        // console.log(target);
-        const prefixxes = RdfMapper.getN3NsPrefixObject(ns);
-        const writer = N3.Writer({ prefixes: prefixxes });
-
-        const { DataFactory } = N3;
-        const { namedNode, literal, defaultGraph, quad } = DataFactory;
-        writer.addQuad(
-            namedNode(`person:${subject['val']}`),
-            namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            namedNode(beanType)
-        );
-
-        const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', target);
-        properties.forEach((p: IRdfPropertyMetadata) => {
-            const q = quad(
-                namedNode(`person:${subject['val']}`),
-                namedNode(p.decoratorMetadata.prop),
-                literal(p.val, {value: p.decoratorMetadata.xsdType})
-            );
-
-            writer.addQuad(
-               q
-            );
-
-            // console.log(q.object.datatype.value)
-        });
-
-
-        let result;
-        writer.end((error, r) => {
-            result = r;
-        });
-
-        return result;
+        const serializerProcessor: SerializerProcessor = new SerializerProcessor(target);
+        return serializerProcessor.serialize(target);
     }
 
     public static deserialize <T>(type: { new(): T }, ttlData: string): T {

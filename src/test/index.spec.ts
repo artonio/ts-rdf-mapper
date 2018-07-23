@@ -64,4 +64,49 @@ describe('Testing basic serialization functions', () => {
 
     });
 
+    it('Should serialize basic relations', () => {
+        @RdfNamespaces([
+            {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
+            {prefix: 'person', uri: 'http://example.com/Person/'},
+            {prefix: 'address', uri: 'http://xmlns.com/foaf/0.1/address/'}
+        ])
+        @RdfBean('foaf:Address')
+        class Address {
+            @RdfSubject('address')
+            public uuid: string;
+
+            @RdfProperty({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
+            public streetName: string;
+
+        }
+
+        @RdfNamespaces([
+            {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
+            {prefix: 'person', uri: 'http://example.com/Person/'}
+        ])
+        @RdfBean('foaf:Person')
+        class Person {
+            @RdfSubject('person')
+            public uuid: string;
+
+            @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
+            public name: string;
+
+            @RdfProperty({prop: 'person:hasAddress'})
+            public address: Address;
+        }
+        const a = new Address();
+        a.uuid = 'address-uuid';
+        a.streetName = 'Jasmine';
+
+        const p = new Person();
+        p.uuid = 'random-uuid';
+        p.name = 'John';
+        p.address = a;
+
+        // const b = RdfMapper.serialize(p);
+        // console.log(b);
+
+    });
+
 });
