@@ -16,12 +16,7 @@ export class SerializerProcessor {
 
     public serialize(target: any) {
         this.process(target);
-        let result;
-        this.n3Writer.end((error, r) => {
-            result = r;
-        });
-
-        return result;
+        return this.getTTLString();
     }
 
     private process(target: any) {
@@ -44,25 +39,44 @@ export class SerializerProcessor {
         const properties: IRdfPropertyMetadata[] = Reflect
                                             .getMetadata('RdfProperty', target);
         properties.forEach((p: IRdfPropertyMetadata) => {
-            const q = quad(
-                namedNode(`person:${subject['val']}`),
-                namedNode(p.decoratorMetadata.prop),
-                literal(p.val, {value: p.decoratorMetadata.xsdType})
-            );
 
+            let q;
             if (typeof  p.val === 'object') {
-                // const r = RdfMapper.serialize(p.val);
-                // console.log(r);
+                if (p.val) {
+                    const r = this.process(p.val); // returns NamedNode
+                    q = quad(
+                        namedNode(`person:${subject['val']}`),
+                        namedNode(p.decoratorMetadata.prop),
+                        r
+                    );
+                    this.n3Writer.addQuad(
+                        q
+                    );
+                }
+            } else {
+                q = quad(
+                    namedNode(`person:${subject['val']}`),
+                    namedNode(p.decoratorMetadata.prop),
+                    literal(p.val, {value: p.decoratorMetadata.xsdType})
+                );
+                this.n3Writer.addQuad(
+                    q
+                );
             }
-
-            this.n3Writer.addQuad(
-                q
-            );
 
             // console.log(q.object.datatype.value)
         });
+        return namedNode(`person:${subject['val']}`);
 
+    }
 
+    private getTTLString(): string {
+        let result;
+        this.n3Writer.end((error, r) => {
+            result = r;
+        });
+
+        return result;
     }
 
     private getN3NsPrefixObject(ns: IRdfNamespaces[]) {

@@ -51,8 +51,8 @@ describe('Testing basic serialization functions', () => {
         p.height = 198.5;
         p.buoyancy = 53.2;
 
-        const b = RdfMapper.serialize(p);
-        console.log(b);
+        // const b = RdfMapper.serialize(p);
+        // console.log(b);
 
         // const parser = new N3.Parser();
         // parser.parse(b, (error, quad, prefixes) => {
@@ -64,7 +64,7 @@ describe('Testing basic serialization functions', () => {
 
     });
 
-    it('Should serialize basic relations', () => {
+    it('Should one to one relationship', () => {
         @RdfNamespaces([
             {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
             {prefix: 'person', uri: 'http://example.com/Person/'},
@@ -100,12 +100,12 @@ describe('Testing basic serialization functions', () => {
         a.streetName = 'Jasmine';
 
         const p = new Person();
-        p.uuid = 'random-uuid';
+        p.uuid = 'person-uuid';
         p.name = 'John';
         p.address = a;
 
-        // const b = RdfMapper.serialize(p);
-        // console.log(b);
+        const b = RdfMapper.serialize(p);
+        console.log(b);
 
     });
 

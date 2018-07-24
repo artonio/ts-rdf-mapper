@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import {IRdfNamespaces} from './annotations/interfaces/IRdfNamespaces';
 import {SerializerProcessor} from './processors/SerializerProcessor';
 
 export class RdfMapper {

@@ -10,7 +10,6 @@ export const RdfNamespaces = (prefixValuePairs?: IRdfNamespaces[]) => {
         // a utility function to generate instances of a class
         function construct(constructor, args) {
             const c: any = function () {
-                // return constructor.apply(this, args);
                 return constructor.apply(this, args);
             };
             c.prototype = constructor.prototype;
