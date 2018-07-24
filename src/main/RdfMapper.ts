@@ -13,12 +13,4 @@ export class RdfMapper {
         return dtoInstance;
     }
 
-    public static getN3NsPrefixObject(ns: IRdfNamespaces[]) {
-        const r = {};
-        ns.forEach((namespace: IRdfNamespaces) => {
-            r[namespace.prefix] = namespace.uri;
-        });
-        r['xsd'] = 'http://www.w3.org/2001/XMLSchema#';
-        return r;
-    }
 }
