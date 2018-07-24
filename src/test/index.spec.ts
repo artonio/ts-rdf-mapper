@@ -64,7 +64,7 @@ describe('Testing basic serialization functions', () => {
 
     });
 
-    it('Should one to one relationship', () => {
+    it('Serialize one to one relationship', () => {
         @RdfNamespaces([
             {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
             {prefix: 'person', uri: 'http://example.com/Person/'},

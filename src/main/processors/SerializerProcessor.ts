@@ -22,7 +22,7 @@ export class SerializerProcessor {
     private process(target: any) {
         const ns: IRdfNamespaces[] = Reflect.getMetadata('RdfNamespaces', target);
         const beanType: string = Reflect.getMetadata('RdfBean', target);
-        const subject: string = Reflect.getMetadata('RdfSubject', target);
+        const subject: {key: string; val: string; prop: string} = Reflect.getMetadata('RdfSubject', target);
 
         const prefixxes = this.getN3NsPrefixObject(ns);
         // const writer = N3.Writer({ prefixes: prefixxes });
@@ -31,7 +31,7 @@ export class SerializerProcessor {
         const { DataFactory } = N3;
         const { namedNode, literal, defaultGraph, quad } = DataFactory;
         this.n3Writer.addQuad(
-            namedNode(`person:${subject['val']}`),
+            namedNode(`${subject.prop}:${subject['val']}`),
             namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
             namedNode(beanType)
         );
@@ -45,7 +45,7 @@ export class SerializerProcessor {
                 if (p.val) {
                     const r = this.process(p.val); // returns NamedNode
                     q = quad(
-                        namedNode(`person:${subject['val']}`),
+                        namedNode(`${subject.prop}:${subject['val']}`),
                         namedNode(p.decoratorMetadata.prop),
                         r
                     );
@@ -55,7 +55,7 @@ export class SerializerProcessor {
                 }
             } else {
                 q = quad(
-                    namedNode(`person:${subject['val']}`),
+                    namedNode(`${subject.prop}:${subject['val']}`),
                     namedNode(p.decoratorMetadata.prop),
                     literal(p.val, {value: p.decoratorMetadata.xsdType})
                 );
@@ -66,7 +66,7 @@ export class SerializerProcessor {
 
             // console.log(q.object.datatype.value)
         });
-        return namedNode(`person:${subject['val']}`);
+        return namedNode(`${subject.prop}:${subject['val']}`);
 
     }
 
