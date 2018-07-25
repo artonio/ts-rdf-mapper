@@ -2,6 +2,7 @@ import * as N3 from 'n3';
 import 'reflect-metadata';
 import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
+import {Utils} from '../Utils';
 
 export class SerializerProcessor {
 
@@ -40,28 +41,28 @@ export class SerializerProcessor {
                                             .getMetadata('RdfProperty', target);
         properties.forEach((p: IRdfPropertyMetadata) => {
 
-            let q;
-            if (typeof  p.val === 'object') {
-                if (p.val) {
-                    const r = this.process(p.val); // returns NamedNode
+            if (p.val) {
+                let q;
+                if (typeof  p.val === 'object') {
+                        const r = this.process(p.val); // returns NamedNode
+                        q = quad(
+                            namedNode(`${subject.prop}:${subject['val']}`),
+                            namedNode(p.decoratorMetadata.prop),
+                            r
+                        );
+                        this.n3Writer.addQuad(
+                            q
+                        );
+                }  else {
                     q = quad(
                         namedNode(`${subject.prop}:${subject['val']}`),
                         namedNode(p.decoratorMetadata.prop),
-                        r
+                        literal(p.val, {value: p.decoratorMetadata.xsdType})
                     );
                     this.n3Writer.addQuad(
                         q
                     );
                 }
-            } else {
-                q = quad(
-                    namedNode(`${subject.prop}:${subject['val']}`),
-                    namedNode(p.decoratorMetadata.prop),
-                    literal(p.val, {value: p.decoratorMetadata.xsdType})
-                );
-                this.n3Writer.addQuad(
-                    q
-                );
             }
 
             // console.log(q.object.datatype.value)

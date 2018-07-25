@@ -103,6 +103,7 @@ describe('Testing basic serialization functions', () => {
         p.uuid = 'person-uuid';
         p.name = 'John';
         p.address = a;
+        // p.address = [a];
 
         const b = RdfMapper.serialize(p);
         console.log(b);

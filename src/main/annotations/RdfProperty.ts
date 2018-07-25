@@ -24,6 +24,8 @@ export const RdfProperty = (prop: IRdfProperty) => {
             s.push({key: key, val: value, decoratorMetadata: prop});
             // Define or redefine metadata for current target
             Reflect.defineMetadata('RdfProperty', s, target);
+            console.log(Array === Reflect.getMetadata('design:type', target, key));
+            console.log(Reflect.getOwnMetadata('design:type', target, key));
         };
 
         if (delete target[key]) {
