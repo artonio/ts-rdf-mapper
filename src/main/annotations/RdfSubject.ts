@@ -58,7 +58,7 @@ export const RdfSubject = (prop: string) => {
             //     // Define or redefine metadata for current target
             // }
             // Reflect.defineMetadata('RdfSubject', s, target);
-            return prop + value;
+            return value;
         });
     };
 };
