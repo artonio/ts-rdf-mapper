@@ -1,10 +1,14 @@
 import 'reflect-metadata';
+import {exampleDecorator, logClass, logClazz, logProperty} from '../main/annotations/logClass';
 import {RdfBean} from '../main/annotations/RdfBean';
 import {RdfNamespaces} from '../main/annotations/RdfNamespaces';
 import {RdfProperty} from '../main/annotations/RdfProperty';
 import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
+import {Addr, Per} from './models/models';
+import {IRdfPropertyMetadata} from '../main/annotations/interfaces/IRdfPropertyMetadata';
+
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
 
@@ -92,9 +96,10 @@ describe('Testing basic serialization functions', () => {
             @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
             public name: string;
 
-            @RdfProperty({prop: 'person:hasAddress'})
+            @RdfProperty({prop: 'person:hasAddress', clazz: Address})
             public address: Address;
         }
+
         const a = new Address();
         a.uuid = 'address-uuid';
         a.streetName = 'Jasmine';
@@ -103,8 +108,58 @@ describe('Testing basic serialization functions', () => {
         p.uuid = 'person-uuid';
         p.name = 'John';
         p.address = a;
-        // p.address = [a];
 
+        // const b = RdfMapper.serialize(p);
+        // console.log(b);
+
+    });
+
+    it('Serialize one to many relationship', () => {
+
+        // @RdfNamespaces([
+        //     {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
+        //     {prefix: 'person', uri: 'http://example.com/Person/'},
+        //     {prefix: 'address', uri: 'http://xmlns.com/foaf/0.1/address/'}
+        // ])
+        // @RdfBean('foaf:Address')
+        // class Peoples {
+        //     // @logProperty({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING}, Peoples)
+        //     @exampleDecorator({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
+        //     name: string = undefined;
+        // }
+        //
+        // const p1 = new Peoples();
+        // p1.name = 'John';
+        // const p2 = new Peoples();
+        // p2.name = 'Abe';
+        //
+        // const properties1: IRdfPropertyMetadata[] = Reflect
+        //     .getMetadata('RdfProperty', p1);
+        //
+        // const properties2: IRdfPropertyMetadata[] = Reflect
+        //     .getMetadata('RdfProperty', p2);
+        //
+        // console.log(p1.name);
+        // console.log(p2.name);
+        //
+        const a1 = new Addr();
+        a1.uuid = 'uuid1';
+        a1.streetName = 'Jasmine';
+        //
+        const a2 = new Addr();
+        a2.uuid = 'uuid2';
+        a2.streetName = 'Joseph';
+        console.log(a1.uuid);
+        console.log(a1.streetName);
+        console.log(a2.uuid);
+        console.log(a2.streetName);
+        // //
+        const p = new Per();
+        p.uuid = 'person-uuid';
+        p.addresses = [a1, a2];
+        // p.addresses.forEach(c => {
+        //     console.log(c.uuid);
+        // });
         const b = RdfMapper.serialize(p);
         console.log(b);
 

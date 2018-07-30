@@ -6,9 +6,17 @@ export const RdfBean = (value: string) => {
         // a utility function to generate instances of a class
         function construct(constructor, args) {
             const c: any = function () {
-                return constructor.apply(this, args);
+                const keys = Object.keys(constructor.prototype);
+                // We delete all key value pairs from the object to avaid multiple instances
+                // sharing the same properties
+                // keys.forEach(key => {
+                //     delete constructor.prototype[key];
+                // });
+                return new constructor();
+                // return constructor.apply(this, args);
             };
             c.prototype = constructor.prototype;
+
             return new c();
         }
 
