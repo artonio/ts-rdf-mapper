@@ -41,7 +41,7 @@ import {IRdfPropertyMetadata} from './interfaces/IRdfPropertyMetadata';
 //     };
 // }
 
-const makeRDFPropertyMapper = <T>(prototype: any, key: string, mapper: (value: any) => T) => {
+const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any, mapper: (value: any) => T) => {
     const values = new Map<any, T>();
     Object.defineProperty(prototype, key, {
         set(firstValue: any) {
@@ -51,6 +51,13 @@ const makeRDFPropertyMapper = <T>(prototype: any, key: string, mapper: (value: a
                 },
                 set(value: any) {
                     values.set(this, mapper(value));
+                    const s: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', this) || [];
+                    if (value) {
+                        s.push({key: key, val: value, decoratorMetadata: prop, target: this});
+                        // Define or redefine metadata for current target
+                    }
+                    // console.log('define metadata')
+                    Reflect.defineMetadata('RdfProperty', s, this);
                 },
                 enumerable: true,
             });
@@ -63,14 +70,8 @@ const makeRDFPropertyMapper = <T>(prototype: any, key: string, mapper: (value: a
 
 export const RdfProperty = (prop: IRdfProperty) => {
     return (target: Object, key: string) => {
-        makeRDFPropertyMapper(target, key, (value: any) => {
-            const s: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', target) || [];
-            if (value) {
-                s.push({key: key, val: value, decoratorMetadata: prop});
-                // Define or redefine metadata for current target
-            }
-            console.log('define metadata')
-            Reflect.defineMetadata('RdfProperty', s, target);
+        makeRDFPropertyMapper(target, key, prop, (value: any) => {
+
             return value;
         });
     };

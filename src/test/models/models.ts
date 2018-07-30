@@ -11,11 +11,14 @@ import {XSDDataType} from '../../main/annotations/XSDDataType';
 ])
 @RdfBean('foaf:Address')
 export class Addr {
-    @RdfSubject('http://xmlns.com/foaf/0.1/address/')
+    @RdfSubject('address')
     public uuid: string;
 
     @RdfProperty({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
     public streetName: string;
+
+    @RdfProperty({prop: 'address:houseNum', xsdType: XSDDataType.XSD_STRING})
+    public houseNum: number;
 }
 
 @RdfNamespaces([
@@ -24,7 +27,7 @@ export class Addr {
 ])
 @RdfBean('foaf:Person')
 export class Per {
-    @RdfSubject('http://example.com/Person/')
+    @RdfSubject('person')
     public uuid: string;
 
     @RdfProperty({prop: 'person:hasAddress', clazz: Addr})

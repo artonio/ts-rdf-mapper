@@ -34,8 +34,8 @@ export class SerializerProcessor {
         const { DataFactory } = N3;
         const { namedNode, literal, defaultGraph, quad } = DataFactory;
         this.n3Writer.addQuad(
-            // namedNode(`${subject.prop}:${subject['val']}`),
-            namedNode(`${target[subject.key]}`),
+            namedNode(`${subject.prop}:${subject['val']}`),
+            // namedNode(`${target[subject.key]}`),
             namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
             namedNode(beanType)
         );
@@ -59,8 +59,8 @@ export class SerializerProcessor {
                         p.val.forEach((prop: any) => {
                             const r = this.process(prop); // returns NamedNode
                             q = quad(
-                                // namedNode(`${subject.prop}:${subject['val']}`),
-                                namedNode(`${target[subject.key]}`),
+                                namedNode(`${subject.prop}:${subject['val']}`),
+                                // namedNode(`${target[subject.key]}`),
                                 namedNode(p.decoratorMetadata.prop),
                                 r
                             );
@@ -69,8 +69,8 @@ export class SerializerProcessor {
                     } else {
                         const r = this.process(p.val); // returns NamedNode
                         q = quad(
-                            // namedNode(`${subject.prop}:${subject['val']}`),
-                            namedNode(`${target[subject.key]}`),
+                            namedNode(`${subject.prop}:${subject['val']}`),
+                            // namedNode(`${target[subject.key]}`),
                             namedNode(p.decoratorMetadata.prop),
                             r
                         );
@@ -80,8 +80,8 @@ export class SerializerProcessor {
 
                 } else {
                     q = quad(
-                        // namedNode(`${subject.prop}:${subject['val']}`),
-                        namedNode(`${target[subject.key]}`),
+                        namedNode(`${subject.prop}:${subject['val']}`),
+                        // namedNode(`${target[subject.key]}`),
                         namedNode(p.decoratorMetadata.prop),
                         literal(p.val, {value: p.decoratorMetadata.xsdType})
                     );
@@ -93,8 +93,8 @@ export class SerializerProcessor {
 
             // console.log(q.object.datatype.value)
         });
-        // return namedNode(`${subject.prop}:${subject['val']}`);
-        return  namedNode(`${target[subject.key]}`);
+        return namedNode(`${subject.prop}:${subject['val']}`);
+        // return  namedNode(`${target[subject.key]}`);
     }
 
     private getTTLString(): string {

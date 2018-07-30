@@ -144,14 +144,16 @@ describe('Testing basic serialization functions', () => {
         //
         const a1 = new Addr();
         a1.uuid = 'uuid1';
+        a1.houseNum = 10;
         a1.streetName = 'Jasmine';
         //
         const a2 = new Addr();
         a2.uuid = 'uuid2';
+        a2.houseNum = 223;
         a2.streetName = 'Joseph';
-        console.log(a1.uuid);
+        // console.log(a1.uuid);
         console.log(a1.streetName);
-        console.log(a2.uuid);
+        // console.log(a2.uuid);
         console.log(a2.streetName);
         // //
         const p = new Per();

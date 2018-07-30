@@ -27,7 +27,7 @@
 
 import {IRdfPropertyMetadata} from './interfaces/IRdfPropertyMetadata';
 
-const makeRDFSubjectMapper = <T>(prototype: any, key: string, mapper: (value: any) => T) => {
+const makeRDFSubjectMapper = <T>(prototype: any, key: string, prop: any, mapper: (value: any) => T) => {
     const values = new Map<any, T>();
     Object.defineProperty(prototype, key, {
         set(firstValue: any) {
@@ -36,6 +36,7 @@ const makeRDFSubjectMapper = <T>(prototype: any, key: string, mapper: (value: an
                     return values.get(this);
                 },
                 set(value: any) {
+                    Reflect.defineMetadata('RdfSubject', {key: key, val: value, prop: prop}, this);
                     values.set(this, mapper(value));
                 },
                 enumerable: true,
@@ -49,8 +50,8 @@ const makeRDFSubjectMapper = <T>(prototype: any, key: string, mapper: (value: an
 
 export const RdfSubject = (prop: string) => {
     return (target: Object, key: string) => {
-        makeRDFSubjectMapper(target, key, (value: any) => {
-            Reflect.defineMetadata('RdfSubject', {key: key, val: value, prop: prop}, target);
+        makeRDFSubjectMapper(target, key, prop, (value: any) => {
+
             // const s: any = Reflect.getMetadata('RdfSubject', target) || [];
             // if (value) {
             //     s.push({key: key, val: value, prop: prop});
