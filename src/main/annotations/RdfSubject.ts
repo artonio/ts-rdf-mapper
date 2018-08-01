@@ -1,26 +1,28 @@
+const makeRDFSubjectMapper = <T>(prototype: any, key: string, prop: any, mapper: (value: any) => T) => {
+    const values = new Map<any, T>();
+    Object.defineProperty(prototype, key, {
+        set(firstValue: any) {
+            Object.defineProperty(this, key, {
+                get() {
+                    return values.get(this);
+                },
+                set(value: any) {
+                    Reflect.defineMetadata('RdfSubject', {key: key, val: value, prop: prop}, this);
+                    values.set(this, mapper(value));
+                },
+                enumerable: true,
+            });
+            this[key] = firstValue;
+        },
+        enumerable: true,
+        configurable: true,
+    });
+};
+
 export const RdfSubject = (prop: string) => {
     return (target: Object, key: string) => {
-        let value = target[key];
-
-        const getter = () => {
-            // console.log(`Get => ${key}`);
+        makeRDFSubjectMapper(target, key, prop, (value: any) => {
             return value;
-        };
-
-        const setter = (newVal) => {
-            // console.log(`Set: ${key} => ${newVal}`);
-            value = newVal;
-            Reflect.defineMetadata('RdfSubject', {key: key, val: value, prop: prop}, target);
-        };
-
-        if (delete target[key]) {
-            Object.defineProperty(target, key, {
-                get: getter,
-                set: setter,
-                enumerable: true,
-                configurable: true
-            });
-        }
-
+        });
     };
-}
+};
