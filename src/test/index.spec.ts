@@ -1,13 +1,11 @@
 import 'reflect-metadata';
-import {exampleDecorator, logClass, logClazz, logProperty} from '../main/annotations/logClass';
 import {RdfBean} from '../main/annotations/RdfBean';
 import {RdfNamespaces} from '../main/annotations/RdfNamespaces';
 import {RdfProperty} from '../main/annotations/RdfProperty';
 import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
-import {Addr, Per} from './models/models';
-import {IRdfPropertyMetadata} from '../main/annotations/interfaces/IRdfPropertyMetadata';
+import {Addr, Per, Person, personTTL, SuperBase} from './models/models';
 
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
@@ -115,33 +113,6 @@ describe('Testing basic serialization functions', () => {
     });
 
     it('Serialize one to many relationship', () => {
-
-        // @RdfNamespaces([
-        //     {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-        //     {prefix: 'person', uri: 'http://example.com/Person/'},
-        //     {prefix: 'address', uri: 'http://xmlns.com/foaf/0.1/address/'}
-        // ])
-        // @RdfBean('foaf:Address')
-        // class Peoples {
-        //     // @logProperty({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING}, Peoples)
-        //     @exampleDecorator({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
-        //     name: string = undefined;
-        // }
-        //
-        // const p1 = new Peoples();
-        // p1.name = 'John';
-        // const p2 = new Peoples();
-        // p2.name = 'Abe';
-        //
-        // const properties1: IRdfPropertyMetadata[] = Reflect
-        //     .getMetadata('RdfProperty', p1);
-        //
-        // const properties2: IRdfPropertyMetadata[] = Reflect
-        //     .getMetadata('RdfProperty', p2);
-        //
-        // console.log(p1.name);
-        // console.log(p2.name);
-        //
         const a1 = new Addr();
         a1.uuid = 'uuid1';
         a1.houseNum = 10;
@@ -159,11 +130,23 @@ describe('Testing basic serialization functions', () => {
         const p = new Per();
         p.uuid = 'person-uuid';
         p.addresses = [a1, a2];
-        // p.addresses.forEach(c => {
-        //     console.log(c.uuid);
-        // });
-        const b = RdfMapper.serialize(p);
-        console.log(b);
+        // const b = RdfMapper.serialize(p);
+        // console.log(b);
+
+    });
+
+    it('Serialize basic inheritance', () => {
+        const sb = new SuperBase();
+        sb.uuid = 'inheritance-uuid';
+        sb.baseProp = 'baseValue';
+        sb.extendedProp = 'extendedValue';
+
+        // const b = RdfMapper.serialize(sb);
+        // console.log(b);
+    });
+
+    it('Deserialize basic ttl', () => {
+        const des = RdfMapper.deserialize(Person, personTTL);
 
     });
 
