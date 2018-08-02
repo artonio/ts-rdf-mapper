@@ -87,7 +87,7 @@ describe('Testing basic serialization functions', () => {
             {prefix: 'person', uri: 'http://example.com/Person/'}
         ])
         @RdfBean('foaf:Person')
-        class Person {
+        class Person1 {
             @RdfSubject('person')
             public uuid: string;
 
@@ -102,7 +102,7 @@ describe('Testing basic serialization functions', () => {
         a.uuid = 'address-uuid';
         a.streetName = 'Jasmine';
 
-        const p = new Person();
+        const p = new Person1();
         p.uuid = 'person-uuid';
         p.name = 'John';
         p.address = a;
@@ -145,9 +145,10 @@ describe('Testing basic serialization functions', () => {
         // console.log(b);
     });
 
-    it('Deserialize basic ttl', () => {
-        const des = RdfMapper.deserialize(Person, personTTL);
-
+    it('Deserialize basic ttl', async (done) => {
+        const instance = await RdfMapper.deserialize(Person, personTTL);
+        console.log(instance);
+        done();
     });
 
 });

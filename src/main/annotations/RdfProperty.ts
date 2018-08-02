@@ -4,6 +4,11 @@ import {IRdfPropertyMetadata} from './interfaces/IRdfPropertyMetadata';
 
 const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any, mapper: (value: any) => T) => {
     const values = new Map<any, T>();
+
+    const rdfPropertyMetaData: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty-non-instance', prototype) || [];
+    rdfPropertyMetaData.push({key: key, val: null, decoratorMetadata: prop});
+    Reflect.defineMetadata('RdfProperty-non-instance', rdfPropertyMetaData, prototype);
+
     Object.defineProperty(prototype, key, {
         set(firstValue: any) {
             Object.defineProperty(this, key, {

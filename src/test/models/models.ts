@@ -14,7 +14,7 @@ export class Addr {
     @RdfSubject('address')
     public uuid: string;
 
-    @RdfProperty({prop: 'address:streetN+ame', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
     public streetName: string;
 
     @RdfProperty({prop: 'address:houseNum', xsdType: XSDDataType.XSD_STRING})
