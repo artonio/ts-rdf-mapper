@@ -39,7 +39,16 @@ export class RdfMapper {
 
         qa.quads.forEach(quad => {
             console.log(`${quad.subject.id} - ${quad.predicate.id} - ${quad.object.id}`);
-        })
+
+            const foundProp: IRdfPropertyMetadata = properties.find((prop: IRdfPropertyMetadata) => {
+                return quad.predicate.id === Utils.getUriFromPrefixedName(prop.decoratorMetadata.prop, ns);
+            });
+
+            if (foundProp) {
+                dtoInstance[foundProp.key] = quad.object.id.replace(/['"]+/g, '');
+            }
+
+        });
         // return dtoInstance;
         return Promise.resolve(dtoInstance);
     }

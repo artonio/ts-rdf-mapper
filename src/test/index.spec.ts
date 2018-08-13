@@ -147,7 +147,17 @@ describe('Testing basic serialization functions', () => {
 
     it('Deserialize basic ttl', async (done) => {
         const instance = await RdfMapper.deserialize(Person, personTTL);
-        console.log(instance);
+
+        // RdfMapper.deserialize(Person, personTTL).then(r => {
+        //     console.log(r);
+        // });
+        console.log(JSON.stringify(instance));
+        expect(instance.firstName).toEqual('David');
+        expect(instance.name).toEqual('David Banner');
+        expect(instance.nick).toEqual('hulk');
+        expect(instance.surname).toEqual('Banner');
+        expect(instance.title).toEqual('Mr');
+
         done();
     });
 
