@@ -5,7 +5,7 @@ import {RdfProperty} from '../main/annotations/RdfProperty';
 import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
-import {Addr, Per, Person, personTTL, SuperBase} from './models/models';
+import {Addr, Per, personTTL, SuperBase} from './models/models';
 
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
@@ -130,8 +130,8 @@ describe('Testing basic serialization functions', () => {
         const p = new Per();
         p.uuid = 'person-uuid';
         p.addresses = [a1, a2];
-        // const b = RdfMapper.serialize(p);
-        // console.log(b);
+        const b = RdfMapper.serialize(p);
+        console.log(b);
 
     });
 
@@ -145,20 +145,17 @@ describe('Testing basic serialization functions', () => {
         // console.log(b);
     });
 
-    it('Deserialize basic ttl', async (done) => {
-        const instance = await RdfMapper.deserialize(Person, personTTL);
-
-        // RdfMapper.deserialize(Person, personTTL).then(r => {
-        //     console.log(r);
-        // });
-        console.log(JSON.stringify(instance));
-        expect(instance.firstName).toEqual('David');
-        expect(instance.name).toEqual('David Banner');
-        expect(instance.nick).toEqual('hulk');
-        expect(instance.surname).toEqual('Banner');
-        expect(instance.title).toEqual('Mr');
-
-        done();
-    });
+    // it('Deserialize basic ttl', async (done) => {
+    //     const instance = await RdfMapper.deserialize(Person, personTTL);
+    //
+    //     console.log(JSON.stringify(instance));
+    //     expect(instance.firstName).toEqual('David');
+    //     expect(instance.name).toEqual('David Banner');
+    //     expect(instance.nick).toEqual('hulk');
+    //     expect(instance.surname).toEqual('Banner');
+    //     expect(instance.title).toEqual('Mr');
+    //
+    //     done();
+    // });
 
 });

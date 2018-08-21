@@ -45,5 +45,8 @@
     "rollup-plugin-typescript": "~0.8.1",
     "tslint": "~5.5.0",
     "typings": "^0.8.1"
+  },
+  "dependencies": {
+    "@types/n3": "^1.0.0"
   }
 }

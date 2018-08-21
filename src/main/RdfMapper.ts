@@ -64,12 +64,14 @@ export class RdfMapper {
 
                 if (q) {
                     quads.push(q);
+                } else {
+                    resolve({quads: quads, prefixes: prefixes});
                 }
 
                 if (p) {
                     prefixes.push(p);
                 }
-                resolve({quads: quads, prefixes: prefixes});
+                // resolve({quads: quads, prefixes: prefixes});
             });
         });
     }
