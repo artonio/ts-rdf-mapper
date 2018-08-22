@@ -1,5 +1,6 @@
 import * as N3 from 'n3';
-import {N3Writer, Quad} from 'n3';
+import {N3Writer} from 'n3';
+import * as RDF from 'rdf-js';
 import 'reflect-metadata';
 import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
@@ -9,45 +10,36 @@ export class SerializerProcessor {
     objectToBeSerialized: any;
     // N3 writer
     n3Writer: N3Writer;
-    quadsArr: any[] = [];
+    quadsArr: RDF.Quad[] = [];
+    prefixes: N3.Prefixes = {};
 
     constructor(target: any) {
         this.objectToBeSerialized = target;
-        this.n3Writer = N3.Writer();
     }
 
     public serialize(target: any) {
         this.process(target);
-        this.quadsArr.sort((a, b) => {
-           if (a.subject.id < b.subject.id) {
-               return 1;
-           }
-           if (a.subject.id > b.subject.id) {
-               return -1;
-           }
-           return 0;
-        });
+        this.sortQuads(this.quadsArr);
         // console.log(this.quadsArr);
+        this.n3Writer = N3.Writer({prefixes: this.prefixes});
         this.n3Writer.addQuads(this.quadsArr);
         return this.getTTLString();
     }
 
-    private process(target: any) {
+    private process(target: any): RDF.NamedNode {
         const ns: IRdfNamespaces[] = Reflect.getMetadata('RdfNamespaces', target);
         const beanType: string = Reflect.getMetadata('RdfBean', target);
         const subject: {key: string; val: string; prop: string} = Reflect.getMetadata('RdfSubject', target);
-        // console.log('process')
-        // console.log(target[subject.key]);
 
         const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
-        this.n3Writer.addPrefixes(prefixxes);
+        this.prefixes = {...prefixxes};
+        // this.n3Writer.addPrefixes(prefixxes); waiting for DefinitelyTyped merge
 
-        const resourceIdentifierQuad = N3.DataFactory.quad(N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
+        const resourceIdentifierQuad: RDF.Quad = N3.DataFactory.quad(N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
             N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
             N3.DataFactory.namedNode(beanType));
 
         this.quadsArr.push(resourceIdentifierQuad);
-        // this.n3Writer.addQuad(resourceIdentifierQuad);
 
         const properties: IRdfPropertyMetadata[] = Reflect
                                             .getMetadata('RdfProperty', target);
@@ -56,7 +48,7 @@ export class SerializerProcessor {
             const propertyClassType = p.decoratorMetadata.clazz;
 
             if (p.val) {
-                let q;
+                let q: RDF.Quad;
                 if (propertyClassType) {
                     if (Array.isArray(p.val)) {
                         // console.log(`Value: ${p.val} is an Array`);
@@ -69,17 +61,15 @@ export class SerializerProcessor {
                                 r
                             );
                             this.quadsArr.push(q);
-                            // this.n3Writer.addQuad(q);
                         });
                     } else {
-                        const r = this.process(p.val); // returns NamedNode
+                        const r: RDF.NamedNode = this.process(p.val); // returns NamedNode
                         q = N3.DataFactory.quad(
                             N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
                             N3.DataFactory.namedNode(p.decoratorMetadata.prop),
                             r
                         );
                         this.quadsArr.push(q);
-                        // this.n3Writer.addQuad(q);
 
                     }
 
@@ -90,7 +80,6 @@ export class SerializerProcessor {
                         N3.DataFactory.literal(p.val, N3.DataFactory.namedNode(p.decoratorMetadata.xsdType))
                     );
                     this.quadsArr.push(q);
-                    // this.n3Writer.addQuad(q);
                 }
             }
 
@@ -115,5 +104,17 @@ export class SerializerProcessor {
         });
         r['xsd'] = N3.DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#');
         return r;
+    }
+
+    private sortQuads(arr: RDF.Quad[]) {
+        arr.sort((a, b) => {
+            if (a.subject.value < b.subject.value) {
+                return 1;
+            }
+            if (a.subject.value > b.subject.value) {
+                return -1;
+            }
+            return 0;
+        });
     }
 }

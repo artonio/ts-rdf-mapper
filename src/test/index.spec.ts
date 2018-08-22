@@ -117,21 +117,29 @@ describe('Testing basic serialization functions', () => {
         a1.uuid = 'uuid1';
         a1.houseNum = 10;
         a1.streetName = 'Jasmine';
-        //
+
         const a2 = new Addr();
         a2.uuid = 'uuid2';
         a2.houseNum = 223;
         a2.streetName = 'Joseph';
-        // console.log(a1.uuid);
-        // console.log(a1.streetName);
-        // console.log(a2.uuid);
-        // console.log(a2.streetName);
-        // //
+
         const p = new Per();
         p.uuid = 'person-uuid';
         p.addresses = [a1, a2];
+
         const b = RdfMapper.serialize(p);
         console.log(b);
+        expect(b).toContain(`person:person-uuid a foaf:Person;`);
+        expect(b).toContain(`address:uuid2 a foaf:Address;`);
+        expect(b).toContain(`address:uuid1 a foaf:Address;`);
+
+        expect(b).toContain(`person:hasAddress address:uuid1, address:uuid2.`);
+
+        expect(b).toContain(`address:houseNum "223"^^xsd:string`);
+        expect(b).toContain(`address:streetName "Joseph"^^xsd:string`);
+
+        expect(b).toContain(`address:houseNum "223"^^xsd:string`);
+        expect(b).toContain(`address:streetName "Jasmine"^^xsd:string`);
 
     });
 
