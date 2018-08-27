@@ -4,6 +4,8 @@ import * as RDF from 'rdf-js';
 import 'reflect-metadata';
 import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
+import {Serializer} from '../annotations/interfaces/Serializer';
+import {Utils} from '../Utils';
 
 export class SerializerProcessor {
 
@@ -12,6 +14,7 @@ export class SerializerProcessor {
     n3Writer: N3Writer;
     quadsArr: RDF.Quad[] = [];
     prefixes: N3.Prefixes = {};
+    serializers: any = {};
 
     constructor(target: any) {
         this.objectToBeSerialized = target;
@@ -46,14 +49,16 @@ export class SerializerProcessor {
         properties.forEach((p: IRdfPropertyMetadata) => {
 
             const propertyClassType = p.decoratorMetadata.clazz;
+            const enumTypeOpt = p.decoratorMetadata.enumOptions;
 
+            // If value is set for the current key, process it
             if (p.val) {
                 let q: RDF.Quad;
                 if (propertyClassType) {
                     if (Array.isArray(p.val)) {
                         // console.log(`Value: ${p.val} is an Array`);
                         p.val.forEach((prop: any) => {
-                            const r = this.process(prop); // returns NamedNode
+                            const r: RDF.NamedNode = this.process(prop); // returns NamedNode
 
                             q = N3.DataFactory.quad(
                                 N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
@@ -70,8 +75,16 @@ export class SerializerProcessor {
                             r
                         );
                         this.quadsArr.push(q);
-
                     }
+
+                } else if (enumTypeOpt) {
+                    const s: Serializer = this.getOrCreateSerializer(enumTypeOpt.serializer);
+                    q = N3.DataFactory.quad(
+                        N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
+                        N3.DataFactory.namedNode(p.decoratorMetadata.prop),
+                        N3.DataFactory.literal(s.serialize(p.val), N3.DataFactory.namedNode(p.decoratorMetadata.xsdType))
+                    );
+                    this.quadsArr.push(q);
 
                 } else {
                     q = N3.DataFactory.quad(
@@ -116,5 +129,14 @@ export class SerializerProcessor {
             }
             return 0;
         });
+    }
+
+    /**
+     * Checks to see if the serializer already exists or not.
+     * If not, creates a new one and caches it, returns the
+     * cached instance otherwise.
+     */
+    private getOrCreateSerializer(type: any): any {
+        return Utils.getCachedType(type, this.serializers);
     }
 }

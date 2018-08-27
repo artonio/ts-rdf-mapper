@@ -5,7 +5,7 @@ import {RdfProperty} from '../main/annotations/RdfProperty';
 import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
-import {Addr, Per, personTTL, SuperBase} from './models/models';
+import {Addr, Calendar, Days, Per, personTTL, SuperBase} from './models/models';
 
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
@@ -128,7 +128,7 @@ describe('Testing basic serialization functions', () => {
         p.addresses = [a1, a2];
 
         const b = RdfMapper.serialize(p);
-        console.log(b);
+        // console.log(b);
         expect(b).toContain(`person:person-uuid a foaf:Person;`);
         expect(b).toContain(`address:uuid2 a foaf:Address;`);
         expect(b).toContain(`address:uuid1 a foaf:Address;`);
@@ -151,6 +151,15 @@ describe('Testing basic serialization functions', () => {
 
         // const b = RdfMapper.serialize(sb);
         // console.log(b);
+    });
+
+    it('Serialize Enums', () => {
+       const cal = new Calendar();
+       cal.uuid = 'cal-uuid';
+       cal.day = Days.Mon;
+
+        const b = RdfMapper.serialize(cal);
+        console.log(b);
     });
 
     // it('Deserialize basic ttl', async (done) => {

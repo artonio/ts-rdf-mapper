@@ -3,6 +3,7 @@ import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {RdfSubject} from '../../main/annotations/RdfSubject';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
+import {Serializer} from '../../main/annotations/interfaces/Serializer';
 
 @RdfNamespaces([
     {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
@@ -75,6 +76,30 @@ export class Person {
 
     @RdfProperty({prop: 'foaf:title', xsdType: XSDDataType.XSD_STRING})
     title: string;
+
+}
+
+export class DaysSerializer implements Serializer {
+    serialize(value: Days): string {
+        return `${Days[value]}`;
+    }
+}
+
+export enum Days {
+    Sun, Mon, Tues, Wed, Thurs, Fri, Sat
+}
+
+@RdfNamespaces([
+    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
+    {prefix: 'calendar', uri: 'http://example.com/Calendar/'}
+])
+@RdfBean('foaf:Calendar')
+export class Calendar {
+    @RdfSubject('calendar')
+    public uuid: string;
+
+    @RdfProperty({prop: 'foaf:day', xsdType: XSDDataType.XSD_STRING, enumOptions: {enumType: Days, serializer: DaysSerializer}})
+    public day: Days;
 
 }
 

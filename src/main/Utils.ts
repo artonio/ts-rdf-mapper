@@ -37,4 +37,18 @@ export class Utils {
 
         return holder;
     }
+
+    public static getTypeNameFromInstance(instance): string {
+        return instance.toString().trim().split(/[\s\()]/g)[1];
+    }
+
+    public static getCachedType(type: any, cache: Object): any {
+        // tslint:disable-next-line:triple-equals
+        const typeName: string = type.getJsonObjectMapperCacheKey != undefined ? type.getJsonObjectMapperCacheKey() : Utils.getTypeNameFromInstance(type);
+        if (!cache[typeName]) {
+            cache[typeName] = new type();
+        }
+        return cache[typeName];
+    }
+
 }
