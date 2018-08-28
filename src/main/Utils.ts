@@ -1,5 +1,4 @@
 import * as N3 from 'n3';
-import * as RDF from 'rdf-js';
 import 'reflect-metadata';
 import {IRdfNamespaces} from './annotations/interfaces/IRdfNamespaces';
 
@@ -16,9 +15,6 @@ export class Utils {
         let holder;
         const qualifiedNameArr: string[] = prefixedUri.split(':');
         if (qualifiedNameArr.length > 0) {
-            // const prefixUriMap: IRdfNamespaces = prefixesMap.find((e: IRdfNamespaces) => {
-            //     return e.prefix === qualifiedNameArr[0];
-            // });
             const uri = prefixesMap[qualifiedNameArr[0]];
             if (uri) {
                 holder = uri + qualifiedNameArr[1];

@@ -19,8 +19,8 @@ describe('Testing basic serialization functions', () => {
         p.height = 198.5;
         p.buoyancy = 53.2;
 
-        const b = RdfMapper.serialize(p);
-        console.log(b);
+        // const b = RdfMapper.serialize(p);
+        // console.log(b);
 
         // const parser = new N3.Parser();
         // parser.parse(b, (error, quad, prefixes) => {
@@ -124,8 +124,8 @@ describe('Testing basic serialization functions', () => {
        cal.uuid = 'cal-uuid';
        cal.day = Days.Mon;
 
-        const b = RdfMapper.serialize(cal);
-        console.log(b);
+        // const b = RdfMapper.serialize(cal);
+        // console.log(b);
     });
 
 });

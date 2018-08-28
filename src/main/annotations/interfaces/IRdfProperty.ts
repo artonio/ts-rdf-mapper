@@ -1,6 +1,6 @@
 export interface IRdfProperty {
     // can be used to identify type of object at runtime
-    clazz?: Function;
+    clazz?: any;
     /**
      * @prop - Predicate in the form of prefix:somename or a full URI
      */

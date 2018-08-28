@@ -17,21 +17,23 @@ export class DeserializerProcessor {
     constructor() {}
 
     public async deserialize<T>(type: { new(): T }, ttlData: string): Promise<T> {
-        const dtoInstance = new type();
-        const parser: N3.N3Parser = new N3.Parser();
-        const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', type.prototype);
-        const beanType: string = Reflect.getMetadata('RdfBean', type.prototype);
-        const beanTypeUri: string = Utils.getUriFromPrefixedName(beanType, ns); // - this can be undefined
-        // console.log(`${beanType} - ${beanTypeUri}`);
-
-        const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty-non-instance', type.prototype);
-        const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject-non-instance', type.prototype);
-
-        const qa: QuadsAndPrefixes = await this.getQuadsAndPrefixes(ttlData, parser);
+        const qa: QuadsAndPrefixes = await this.getQuadsAndPrefixes(ttlData);
         const store: N3.N3Store = N3.Store();
         store.addQuads(qa.quads);
+        const dtoInstance = this.process(type, store);
 
-        // Find a triple with of the type specified in @RdfBean decorator
+        return Promise.resolve(dtoInstance);
+    }
+
+    private process<T>(type: { new(): T }, store: N3.N3Store): T {
+        const dtoInstance = new type();
+
+        const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', type.prototype);
+        const beanType: string = Reflect.getMetadata('RdfBean', type.prototype);
+        const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty-non-instance', type.prototype);
+        const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject-non-instance', type.prototype);
+        const beanTypeUri: string = Utils.getUriFromPrefixedName(beanType, ns); // - this can be undefined
+
         const numResources: N3.Quad[] = store.getQuads(null, N3.DataFactory.namedNode(this.xsdType), N3.DataFactory.namedNode(beanTypeUri), null);
         if (numResources.length > 0) {
             const triple: N3.Quad = numResources[0];
@@ -43,19 +45,24 @@ export class DeserializerProcessor {
                 if (objects.length > 0) {
                     const ob: RDF.Term = objects[0];
                     if (N3.Util.isLiteral(ob)) {
-                        const c = <RDF.Literal>ob;
-                        console.log(c.datatype.value);
+                        // const literal: RDF.Literal = <RDF.Literal>ob;
                         dtoInstance[rdfProp.key] = ob.value;
+                    }
+
+                    if (N3.Util.isNamedNode(ob)) {
+                        const res = this.process(rdfProp.decoratorMetadata.clazz, store);
+                        dtoInstance[rdfProp.key] = res;
                     }
                 }
             });
-
         }
 
-        return Promise.resolve(dtoInstance);
+        return dtoInstance;
+
     }
 
-    private async getQuadsAndPrefixes(ttlData: string, parser: N3.N3Parser): Promise<any> {
+    private async getQuadsAndPrefixes(ttlData: string): Promise<any> {
+        const parser: N3.N3Parser = new N3.Parser();
         return new Promise((resolve, reject) => {
             const quads: N3.Quad[] = [];
             parser.parse(ttlData, (e: Error, q: N3.Quad, p: N3.Prefixes) => {

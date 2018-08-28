@@ -149,7 +149,7 @@ person:1234567      a                       foaf:Person ;
         foaf:title              "Mr" .
 `;
 
-export const ttlMultipletypes = `
+export const ttlMultipleTypes = `
 @prefix foaf: <http://xmlns.com/foaf/0.1/>.
 @prefix person: <http://example.com/Person/>.
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.

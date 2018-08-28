@@ -21,7 +21,6 @@ const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any, mapper
                     if (value) {
                         s.push({key: key, val: value, decoratorMetadata: prop});
                     }
-                    // console.log('define metadata')
                     // Define or redefine metadata for current instance
                     Reflect.defineMetadata('RdfProperty', s, this);
                 },
