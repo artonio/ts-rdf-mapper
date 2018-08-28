@@ -10,10 +10,10 @@ import {Addr, Calendar, Days, Per, Person, personTTL, SuperBase} from './models/
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
 
-        @RdfNamespaces([
-            {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-            {prefix: 'person', uri: 'http://example.com/Person/'}
-        ])
+        @RdfNamespaces({
+            foaf: 'http://xmlns.com/foaf/0.1/',
+            person: 'http://example.com/Person/'
+        })
         @RdfBean('foaf:Person')
         class Pers {
 
@@ -53,8 +53,8 @@ describe('Testing basic serialization functions', () => {
         p.height = 198.5;
         p.buoyancy = 53.2;
 
-        // const b = RdfMapper.serialize(p);
-        // console.log(b);
+        const b = RdfMapper.serialize(p);
+        console.log(b);
 
         // const parser = new N3.Parser();
         // parser.parse(b, (error, quad, prefixes) => {
@@ -67,11 +67,11 @@ describe('Testing basic serialization functions', () => {
     });
 
     it('Serialize one to one relationship', () => {
-        @RdfNamespaces([
-            {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-            {prefix: 'person', uri: 'http://example.com/Person/'},
-            {prefix: 'address', uri: 'http://xmlns.com/foaf/0.1/address/'}
-        ])
+        @RdfNamespaces({
+            foaf: 'http://xmlns.com/foaf/0.1/',
+            person: 'http://example.com/Person/',
+            address: 'http://xmlns.com/foaf/0.1/address/'
+        })
         @RdfBean('foaf:Address')
         class Address {
             @RdfSubject('address')
@@ -82,10 +82,10 @@ describe('Testing basic serialization functions', () => {
 
         }
 
-        @RdfNamespaces([
-            {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-            {prefix: 'person', uri: 'http://example.com/Person/'}
-        ])
+        @RdfNamespaces({
+            foaf: 'http://xmlns.com/foaf/0.1/',
+            person: 'http://example.com/Person/'
+        })
         @RdfBean('foaf:Person')
         class Person1 {
             @RdfSubject('person')
@@ -167,6 +167,7 @@ describe('Testing basic serialization functions', () => {
 
         console.log(JSON.stringify(instance));
         expect(instance.firstName).toEqual('David');
+        expect(instance.uuid).toEqual('1234567');
         expect(instance.name).toEqual('David Banner');
         expect(instance.nick).toEqual('hulk');
         expect(instance.surname).toEqual('Banner');

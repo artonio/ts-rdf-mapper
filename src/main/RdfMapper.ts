@@ -20,7 +20,7 @@ export class RdfMapper {
     public static async deserialize <T>(type: { new(): T }, ttlData: string): Promise<T> {
         const dtoInstance = new type();
         const parser: N3.N3Parser = new N3.Parser();
-        const ns: IRdfNamespaces[] = Reflect.getMetadata('RdfNamespaces', type.prototype);
+        const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', type.prototype);
         const beanType: string = Reflect.getMetadata('RdfBean', type.prototype);
         const beanTypeUri: string = Utils.getUriFromPrefixedName(beanType, ns); // - this can be undefined
         console.log(`${beanType} - ${beanTypeUri}`);
@@ -41,36 +41,30 @@ export class RdfMapper {
         const numResources: N3.Quad[] = store.getQuads(null, N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'), N3.DataFactory.namedNode(beanTypeUri), null);
         if (numResources.length > 0) {
             const triple: N3.Quad = numResources[0];
-            // dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(triple.subject, subject.prop);
+            dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(triple.subject.value, subject.prop, ns);
+
             console.log(triple);
             const subjectRelatedTriples: N3.Quad[] = store.getQuads(triple.subject, null, null, null);
+            console.log('subjectRelatedTriples');
             console.log(subjectRelatedTriples);
+
+            subjectRelatedTriples.forEach(quad => {
+                const foundProp: IRdfPropertyMetadata = properties.find((prop: IRdfPropertyMetadata) => {
+                    return quad.predicate.value === Utils.getUriFromPrefixedName(prop.decoratorMetadata.prop, ns);
+                });
+
+                if (foundProp) {
+                    dtoInstance[foundProp.key] = quad.object.value.replace(/['"]+/g, '');
+                }
+            });
         }
 
-        // console.log(qa.quads);
-
-        console.log(Utils.doesModelContainBeanType(beanTypeUri, qa.quads)); // No need because we can use N3 Store
-
-        qa.quads.forEach(quad => {
-            // console.log(`${quad.subject.value} - ${quad.predicate.value} - ${quad.object.value}`);
-
-            const foundProp: IRdfPropertyMetadata = properties.find((prop: IRdfPropertyMetadata) => {
-                return quad.predicate.value === Utils.getUriFromPrefixedName(prop.decoratorMetadata.prop, ns);
-            });
-
-            if (foundProp) {
-                dtoInstance[foundProp.key] = quad.object.value.replace(/['"]+/g, '');
-            }
-
-        });
-        // return dtoInstance;
         return Promise.resolve(dtoInstance);
     }
 
     public static async getQuadsAndPrefixes(ttlData: string, parser: N3.N3Parser): Promise<any> {
         return new Promise((resolve, reject) => {
             const quads: N3.Quad[] = [];
-            // const prefixes: N3.Prefixes[] = [];
             parser.parse(ttlData, (e: Error, q: N3.Quad, p: N3.Prefixes) => {
                 if (e) {
                     reject(e);
@@ -81,10 +75,6 @@ export class RdfMapper {
                 } else {
                     resolve({quads: quads, prefixes: p});
                 }
-
-                // if (p) {
-                //     prefixes.push(p);
-                // }
             });
         });
     }

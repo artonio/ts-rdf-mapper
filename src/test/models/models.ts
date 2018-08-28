@@ -5,11 +5,11 @@ import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {RdfSubject} from '../../main/annotations/RdfSubject';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'},
-    {prefix: 'address', uri: 'http://xmlns.com/foaf/0.1/address/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/',
+    address: 'http://xmlns.com/foaf/0.1/address/'
+})
 @RdfBean('foaf:Address')
 export class Addr {
     @RdfSubject('address')
@@ -22,10 +22,10 @@ export class Addr {
     public houseNum: number;
 }
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
 @RdfBean('foaf:Person')
 export class Per {
     @RdfSubject('person')
@@ -40,10 +40,10 @@ export abstract class Base {
     baseProp: string;
 }
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
 @RdfBean('foaf:SuperBase')
 export class SuperBase extends Base {
     @RdfSubject('foaf')
@@ -53,10 +53,10 @@ export class SuperBase extends Base {
     extendedProp: string;
 }
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
 @RdfBean('foaf:Person')
 export class Person {
     @RdfSubject('person')
@@ -89,10 +89,10 @@ export enum Days {
     Sun, Mon, Tues, Wed, Thurs, Fri, Sat
 }
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'calendar', uri: 'http://example.com/Calendar/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    calendar: 'http://example.com/Calendar/'
+})
 @RdfBean('foaf:Calendar')
 export class Calendar {
     @RdfSubject('calendar')

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import {IRdfNamespaces} from './interfaces/IRdfNamespaces';
 
-export const RdfNamespaces = (prefixValuePairs?: IRdfNamespaces[]) => {
+export const RdfNamespaces = (prefixes?: IRdfNamespaces) => {
     return (target: any) => {
 
         // save a reference to the original constructor
@@ -32,7 +32,7 @@ export const RdfNamespaces = (prefixValuePairs?: IRdfNamespaces[]) => {
 
         // copy prototype so intanceof operator still works
         f.prototype = original.prototype;
-        Reflect.defineMetadata('RdfNamespaces', prefixValuePairs, f.prototype);
+        Reflect.defineMetadata('RdfNamespaces', prefixes, f.prototype);
 
         // return new constructor (will override original)
         return f;

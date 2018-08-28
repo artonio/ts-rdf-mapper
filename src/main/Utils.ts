@@ -12,15 +12,16 @@ export class Utils {
         return Array === Utils.getType(instance, key);
     }
 
-    public static getUriFromPrefixedName(prefixedUri: string, prefixesMap: IRdfNamespaces[]): string {
+    public static getUriFromPrefixedName(prefixedUri: string, prefixesMap: IRdfNamespaces): string {
         let holder;
         const qualifiedNameArr: string[] = prefixedUri.split(':');
         if (qualifiedNameArr.length > 0) {
-            const prefixUriMap: IRdfNamespaces = prefixesMap.find((e: IRdfNamespaces) => {
-                return e.prefix === qualifiedNameArr[0];
-            });
-            if (prefixUriMap) {
-                holder = prefixUriMap.uri + qualifiedNameArr[1];
+            // const prefixUriMap: IRdfNamespaces = prefixesMap.find((e: IRdfNamespaces) => {
+            //     return e.prefix === qualifiedNameArr[0];
+            // });
+            const uri = prefixesMap[qualifiedNameArr[0]];
+            if (uri) {
+                holder = uri + qualifiedNameArr[1];
             }
         }
         return holder;
@@ -53,11 +54,11 @@ export class Utils {
         return cache[typeName];
     }
 
-    public static getUUIDFromResourceSubject(subject: N3.NamedNode, prefix: string, prefixesMap: N3.Prefixes): any {
-        let result = subject.value;
-        const prefixUri: RDF.NamedNode = prefixesMap[prefix];
+    public static getUUIDFromResourceSubject(subject: string, prefix: string, prefixesMap: IRdfNamespaces): any {
+        let result = subject;
+        const prefixUri: string = prefixesMap[prefix];
         if (prefixUri) {
-            result = result.replace(prefixUri.value, '');
+            result = result.replace(prefixUri, '');
         }
         return result;
     }

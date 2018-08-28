@@ -31,7 +31,7 @@ export class SerializerProcessor {
     }
 
     private process(target: any): RDF.NamedNode {
-        const ns: IRdfNamespaces[] = Reflect.getMetadata('RdfNamespaces', target);
+        const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', target);
         const beanType: string = Reflect.getMetadata('RdfBean', target);
         const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);
 
@@ -111,11 +111,14 @@ export class SerializerProcessor {
         return result;
     }
 
-    private getN3NsPrefixObject(ns: IRdfNamespaces[]): N3.Prefixes {
+    private getN3NsPrefixObject(ns: IRdfNamespaces): N3.Prefixes {
         const r: N3.Prefixes = {};
-        ns.forEach((namespace: IRdfNamespaces) => {
-            r[namespace.prefix] = N3.DataFactory.namedNode(namespace.uri);
+
+        const keys: string[] = Object.keys(ns);
+        keys.forEach(key => {
+            r[key] = N3.DataFactory.namedNode(ns[key]);
         });
+
         r['xsd'] = N3.DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#');
         return r;
     }
