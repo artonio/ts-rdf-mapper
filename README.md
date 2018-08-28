@@ -1,6 +1,6 @@
 # ts-rdf-mapper
 
-Typescript RDF Turtle Serializer/Deserializer
+Typescript RDF Turtle ISerializer/IDeserializer
 
 Library written in typescript using reflect-metadata. Decorators for classes which allows serialization/deserialization
 of objects to RDF Turtle format using N3.js.

@@ -1,9 +1,9 @@
+import {ISerializer} from '../../main/annotations/interfaces/ISerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
 import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {RdfSubject} from '../../main/annotations/RdfSubject';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
-import {Serializer} from '../../main/annotations/interfaces/Serializer';
 
 @RdfNamespaces([
     {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
@@ -79,7 +79,7 @@ export class Person {
 
 }
 
-export class DaysSerializer implements Serializer {
+export class DaysSerializer implements ISerializer {
     serialize(value: Days): string {
         return `${Days[value]}`;
     }

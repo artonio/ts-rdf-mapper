@@ -1,3 +1,3 @@
-export interface Deserializer {
+export interface IDeserializer {
     deserialize(value: any): any;
 }

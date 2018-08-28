@@ -1,3 +1,5 @@
+import * as N3 from 'n3';
+import * as RDF from 'rdf-js';
 import 'reflect-metadata';
 import {IRdfNamespaces} from './annotations/interfaces/IRdfNamespaces';
 
@@ -24,11 +26,11 @@ export class Utils {
         return holder;
     }
 
-    public static doesModelContainBeanType(beanTypeUri: string, model: any[]): boolean {
+    public static doesModelContainBeanType(beanTypeUri: string, model: N3.Quad[]): boolean {
         let holder = false;
 
         const ind = model.findIndex(m => {
-            return m.object.id === beanTypeUri;
+            return m.object.value === beanTypeUri;
         });
 
         if (ind !== -1) {
@@ -49,6 +51,15 @@ export class Utils {
             cache[typeName] = new type();
         }
         return cache[typeName];
+    }
+
+    public static getUUIDFromResourceSubject(subject: N3.NamedNode, prefix: string, prefixesMap: N3.Prefixes): any {
+        let result = subject.value;
+        const prefixUri: RDF.NamedNode = prefixesMap[prefix];
+        if (prefixUri) {
+            result = result.replace(prefixUri.value, '');
+        }
+        return result;
     }
 
 }

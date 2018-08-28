@@ -1,3 +1,3 @@
-export interface Serializer {
+export interface ISerializer {
     serialize(value: any): string;
 }

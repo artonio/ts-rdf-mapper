@@ -4,7 +4,8 @@ import * as RDF from 'rdf-js';
 import 'reflect-metadata';
 import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
-import {Serializer} from '../annotations/interfaces/Serializer';
+import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
+import {ISerializer} from '../annotations/interfaces/ISerializer';
 import {Utils} from '../Utils';
 
 export class SerializerProcessor {
@@ -32,7 +33,7 @@ export class SerializerProcessor {
     private process(target: any): RDF.NamedNode {
         const ns: IRdfNamespaces[] = Reflect.getMetadata('RdfNamespaces', target);
         const beanType: string = Reflect.getMetadata('RdfBean', target);
-        const subject: {key: string; val: string; prop: string} = Reflect.getMetadata('RdfSubject', target);
+        const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);
 
         const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
         this.prefixes = {...prefixxes};
@@ -78,7 +79,7 @@ export class SerializerProcessor {
                     }
 
                 } else if (enumTypeOpt) {
-                    const s: Serializer = this.getOrCreateSerializer(enumTypeOpt.serializer);
+                    const s: ISerializer = this.getOrCreateSerializer(enumTypeOpt.serializer);
                     q = N3.DataFactory.quad(
                         N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
                         N3.DataFactory.namedNode(p.decoratorMetadata.prop),

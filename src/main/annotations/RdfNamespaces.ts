@@ -11,12 +11,6 @@ export const RdfNamespaces = (prefixValuePairs?: IRdfNamespaces[]) => {
         function construct(constructor, args) {
             const c: any = function () {
                 const keys = Object.keys(constructor.prototype);
-                // We delete all key value pairs from the object to avaid multiple instances
-                // sharing the same properties
-                // keys.forEach(key => {
-                //     delete constructor.prototype[key];
-                // });
-                // return new constructor();
                 return constructor.apply(this, args);
                 // const re = constructor.apply(this.constructor, args);
                 // return constructor.apply(this.constructor, args);
