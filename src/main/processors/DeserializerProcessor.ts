@@ -17,7 +17,12 @@ export class DeserializerProcessor {
     constructor() {}
 
     public async deserialize<T>(type: { new(): T }, ttlData: string): Promise<T> {
-        const qa: QuadsAndPrefixes = await this.getQuadsAndPrefixes(ttlData);
+        let qa: QuadsAndPrefixes
+        try {
+            qa = await this.getQuadsAndPrefixes(ttlData);
+        } catch (e) {
+            throw new Error(e);
+        }
         const store: N3.N3Store = N3.Store();
         store.addQuads(qa.quads);
         const dtoInstance = this.process(type, store);
@@ -61,9 +66,9 @@ export class DeserializerProcessor {
 
     }
 
-    private async getQuadsAndPrefixes(ttlData: string): Promise<any> {
+    private async getQuadsAndPrefixes(ttlData: string): Promise<QuadsAndPrefixes> {
         const parser: N3.N3Parser = new N3.Parser();
-        return new Promise((resolve, reject) => {
+        return new Promise<QuadsAndPrefixes>((resolve, reject) => {
             const quads: N3.Quad[] = [];
             parser.parse(ttlData, (e: Error, q: N3.Quad, p: N3.Prefixes) => {
                 if (e) {
