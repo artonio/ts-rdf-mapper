@@ -1,4 +1,5 @@
 import * as N3 from 'n3';
+import * as RDF from 'rdf-js';
 import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
@@ -10,6 +11,9 @@ interface QuadsAndPrefixes {
 }
 
 export class DeserializerProcessor {
+
+    private readonly xsdType = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+
     constructor() {}
 
     public async deserialize<T>(type: { new(): T }, ttlData: string): Promise<T> {
@@ -27,25 +31,25 @@ export class DeserializerProcessor {
         const store: N3.N3Store = N3.Store();
         store.addQuads(qa.quads);
 
-        const numResources: N3.Quad[] = store.getQuads(null, N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'), N3.DataFactory.namedNode(beanTypeUri), null);
+        // Find a triple with of the type specified in @RdfBean decorator
+        const numResources: N3.Quad[] = store.getQuads(null, N3.DataFactory.namedNode(this.xsdType), N3.DataFactory.namedNode(beanTypeUri), null);
         if (numResources.length > 0) {
             const triple: N3.Quad = numResources[0];
+            // Get URI and set the value for key which contains @RdfSubject annotation
             dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(triple.subject.value, subject.prop, ns);
 
-            // console.log(triple);
-            const subjectRelatedTriples: N3.Quad[] = store.getQuads(triple.subject, null, null, null);
-            // console.log('subjectRelatedTriples');
-            // console.log(subjectRelatedTriples);
-
-            subjectRelatedTriples.forEach(quad => {
-                const foundProp: IRdfPropertyMetadata = properties.find((prop: IRdfPropertyMetadata) => {
-                    return quad.predicate.value === Utils.getUriFromPrefixedName(prop.decoratorMetadata.prop, ns);
-                });
-
-                if (foundProp) {
-                    dtoInstance[foundProp.key] = quad.object.value.replace(/['"]+/g, '');
+            properties.forEach((rdfProp: IRdfPropertyMetadata) => {
+                const objects: RDF.Term[] = store.getObjects(triple.subject, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.prop, ns)), null);
+                if (objects.length > 0) {
+                    const ob: RDF.Term = objects[0];
+                    if (N3.Util.isLiteral(ob)) {
+                        const c = <RDF.Literal>ob;
+                        console.log(c.datatype.value);
+                        dtoInstance[rdfProp.key] = ob.value;
+                    }
                 }
             });
+
         }
 
         return Promise.resolve(dtoInstance);
