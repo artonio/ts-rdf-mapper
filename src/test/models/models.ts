@@ -7,6 +7,39 @@ import {XSDDataType} from '../../main/annotations/XSDDataType';
 
 @RdfNamespaces({
     foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
+@RdfBean('foaf:Person')
+export class PersonMultipleDataTypes {
+
+    @RdfSubject('person')
+    public uuid: string;
+
+    @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
+    public name: string;
+
+    @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})
+    public gender: string;
+
+    @RdfProperty({prop: 'person:age', xsdType: XSDDataType.XSD_INT})
+    public age: number;
+
+    @RdfProperty({prop: 'person:isAdult', xsdType: XSDDataType.XSD_BOOLEAN})
+    public isAdult: boolean;
+
+    @RdfProperty({prop: 'person:weight', xsdType: XSDDataType.XSD_DOUBLE})
+    public weight: number;
+
+    @RdfProperty({prop: 'person:height', xsdType: XSDDataType.XSD_LONG})
+    public height: number;
+
+    @RdfProperty({prop: 'person:buoyancy', xsdType: XSDDataType.XSD_FLOAT})
+    public buoyancy: number;
+
+}
+
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
     person: 'http://example.com/Person/',
     address: 'http://xmlns.com/foaf/0.1/address/'
 })
@@ -114,4 +147,19 @@ person:1234567      a                       foaf:Person ;
         foaf:nick               "hulk" ;
         foaf:surname            "Banner" ;
         foaf:title              "Mr" .
+`;
+
+export const ttlMultipletypes = `
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix person: <http://example.com/Person/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+person:123345dfx a foaf:Person;
+    person:name "Anton"^^xsd:string;
+    person:gender "M"^^xsd:string;
+    person:age "32"^^xsd:int;
+    person:isAdult "true"^^xsd:boolean;
+    person:weight "95.5"^^xsd:double;
+    person:height "198.5"^^xsd:long;
+    person:buoyancy "53.2"^^xsd:float.
 `;

@@ -5,45 +5,11 @@ import {RdfProperty} from '../main/annotations/RdfProperty';
 import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
-import {Addr, Calendar, Days, Per, Person, personTTL, SuperBase} from './models/models';
+import {Addr, Calendar, Days, Per, Person, PersonMultipleDataTypes, personTTL, SuperBase} from './models/models';
 
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
-
-        @RdfNamespaces({
-            foaf: 'http://xmlns.com/foaf/0.1/',
-            person: 'http://example.com/Person/'
-        })
-        @RdfBean('foaf:Person')
-        class Pers {
-
-            @RdfSubject('person')
-            public uuid: string;
-
-            @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
-            public name: string;
-
-            @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})
-            public gender: string;
-
-            @RdfProperty({prop: 'person:age', xsdType: XSDDataType.XSD_INT})
-            public age: number;
-
-            @RdfProperty({prop: 'person:isAdult', xsdType: XSDDataType.XSD_BOOLEAN})
-            public isAdult: boolean;
-
-            @RdfProperty({prop: 'person:weight', xsdType: XSDDataType.XSD_DOUBLE})
-            public weight: number;
-
-            @RdfProperty({prop: 'person:height', xsdType: XSDDataType.XSD_LONG})
-            public height: number;
-
-            @RdfProperty({prop: 'person:buoyancy', xsdType: XSDDataType.XSD_FLOAT})
-            public buoyancy: number;
-
-        }
-
-        const p = new Pers();
+        const p = new PersonMultipleDataTypes();
         p.uuid = '123345dfx';
         p.name = 'Anton';
         p.gender = 'M';
@@ -160,20 +126,6 @@ describe('Testing basic serialization functions', () => {
 
         const b = RdfMapper.serialize(cal);
         console.log(b);
-    });
-
-    it('Deserialize basic ttl', async (done) => {
-        const instance = await RdfMapper.deserialize(Person, personTTL);
-
-        console.log(JSON.stringify(instance));
-        expect(instance.firstName).toEqual('David');
-        expect(instance.uuid).toEqual('1234567');
-        expect(instance.name).toEqual('David Banner');
-        expect(instance.nick).toEqual('hulk');
-        expect(instance.surname).toEqual('Banner');
-        expect(instance.title).toEqual('Mr');
-
-        done();
     });
 
 });

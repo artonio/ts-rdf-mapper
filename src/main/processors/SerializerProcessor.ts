@@ -17,6 +17,8 @@ export class SerializerProcessor {
     prefixes: N3.Prefixes = {};
     serializers: any = {};
 
+    private readonly xsdType = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+
     constructor(target: any) {
         this.objectToBeSerialized = target;
     }
@@ -40,7 +42,7 @@ export class SerializerProcessor {
         // this.n3Writer.addPrefixes(prefixxes); waiting for DefinitelyTyped merge
 
         const resourceIdentifierQuad: RDF.Quad = N3.DataFactory.quad(N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
-            N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+            N3.DataFactory.namedNode(this.xsdType),
             N3.DataFactory.namedNode(beanType));
 
         this.quadsArr.push(resourceIdentifierQuad);
