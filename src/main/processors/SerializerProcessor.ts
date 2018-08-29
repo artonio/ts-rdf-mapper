@@ -10,7 +10,7 @@ import {Utils} from '../Utils';
 
 export class SerializerProcessor {
 
-    objectToBeSerialized: any;
+    objectToBeSerialized: Object;
     // N3 writer
     n3Writer: N3Writer;
     quadsArr: RDF.Quad[] = [];
@@ -19,11 +19,11 @@ export class SerializerProcessor {
 
     private readonly xsdType = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 
-    constructor(target: any) {
+    constructor(target: Object) {
         this.objectToBeSerialized = target;
     }
 
-    public serialize(target: any) {
+    public serialize(target: Object) {
         this.process(target);
         this.sortQuads(this.quadsArr);
         // console.log(this.quadsArr);
@@ -32,7 +32,7 @@ export class SerializerProcessor {
         return this.getTTLString();
     }
 
-    private process(target: any): RDF.NamedNode {
+    private process(target: Object): RDF.NamedNode {
         const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', target);
         const beanType: string = Reflect.getMetadata('RdfBean', target);
         const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);

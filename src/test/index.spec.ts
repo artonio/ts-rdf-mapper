@@ -19,8 +19,8 @@ describe('Testing basic serialization functions', () => {
         p.height = 198.5;
         p.buoyancy = 53.2;
 
-        // const b = RdfMapper.serialize(p);
-        // console.log(b);
+        const b = RdfMapper.serialize(p);
+        console.log(b);
 
         // const parser = new N3.Parser();
         // parser.parse(b, (error, quad, prefixes) => {

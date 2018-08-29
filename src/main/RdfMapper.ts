@@ -3,7 +3,7 @@ import {DeserializerProcessor} from './processors/DeserializerProcessor';
 import {SerializerProcessor} from './processors/SerializerProcessor';
 
 export class RdfMapper {
-    public static serialize(target: any) {
+    public static serialize(target: Object) {
         const serializerProcessor: SerializerProcessor = new SerializerProcessor(target);
         return serializerProcessor.serialize(target);
     }
