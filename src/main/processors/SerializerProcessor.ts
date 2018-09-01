@@ -10,7 +10,6 @@ import {Utils} from '../Utils';
 
 export class SerializerProcessor {
 
-    objectToBeSerialized: Object;
     // N3 writer
     n3Writer: N3Writer;
     quadsArr: RDF.Quad[] = [];
@@ -19,11 +18,10 @@ export class SerializerProcessor {
 
     private readonly xsdType = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 
-    constructor(target: Object) {
-        this.objectToBeSerialized = target;
+    constructor() {
     }
 
-    public serialize(target: Object) {
+    public serialize<T>(target: T | T[]) {
         this.process(target);
         this.sortQuads(this.quadsArr);
         // console.log(this.quadsArr);
@@ -32,76 +30,84 @@ export class SerializerProcessor {
         return this.getTTLString();
     }
 
-    private process(target: Object): RDF.NamedNode {
-        const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', target);
-        const beanType: string = Reflect.getMetadata('RdfBean', target);
-        const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);
+    private process<T>(target: T | T[]): RDF.NamedNode {
+        if (Array.isArray(target)) {
+            console.log('target is array');
+            target.forEach(t => {
+                this.process(t);
+            });
+        } else {
+            const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', target);
+            const beanType: string = Reflect.getMetadata('RdfBean', target);
+            const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);
 
-        const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
-        this.prefixes = {...prefixxes};
-        // this.n3Writer.addPrefixes(prefixxes); waiting for DefinitelyTyped merge
+            const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
+            this.prefixes = {...prefixxes};
+            // this.n3Writer.addPrefixes(prefixxes); waiting for DefinitelyTyped merge
 
-        const resourceIdentifierQuad: RDF.Quad = N3.DataFactory.quad(N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
-            N3.DataFactory.namedNode(this.xsdType),
-            N3.DataFactory.namedNode(beanType));
+            const resourceIdentifierQuad: RDF.Quad = N3.DataFactory.quad(N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
+                N3.DataFactory.namedNode(this.xsdType),
+                N3.DataFactory.namedNode(beanType));
 
-        this.quadsArr.push(resourceIdentifierQuad);
+            this.quadsArr.push(resourceIdentifierQuad);
 
-        const properties: IRdfPropertyMetadata[] = Reflect
-                                            .getMetadata('RdfProperty', target);
-        properties.forEach((p: IRdfPropertyMetadata) => {
+            const properties: IRdfPropertyMetadata[] = Reflect
+                                                .getMetadata('RdfProperty', target);
+            properties.forEach((p: IRdfPropertyMetadata) => {
 
-            const propertyClassType = p.decoratorMetadata.clazz;
-            const enumTypeOpt = p.decoratorMetadata.enumOptions;
+                const propertyClassType = p.decoratorMetadata.clazz;
+                const enumTypeOpt = p.decoratorMetadata.enumOptions;
 
-            // If value is set for the current key, process it
-            if (p.val) {
-                let q: RDF.Quad;
-                if (propertyClassType) {
-                    if (Array.isArray(p.val)) {
-                        // console.log(`Value: ${p.val} is an Array`);
-                        p.val.forEach((prop: any) => {
-                            const r: RDF.NamedNode = this.process(prop); // returns NamedNode
+                // If value is set for the current key, process it
+                if (p.val) {
+                    let q: RDF.Quad;
+                    if (propertyClassType) {
+                        if (Array.isArray(p.val)) {
+                            // console.log(`Value: ${p.val} is an Array`);
+                            p.val.forEach((prop: any) => {
+                                const r: RDF.NamedNode = this.process(prop); // returns NamedNode
 
+                                q = N3.DataFactory.quad(
+                                    N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
+                                    N3.DataFactory.namedNode(p.decoratorMetadata.prop),
+                                    r
+                                );
+                                this.quadsArr.push(q);
+                            });
+                        } else {
+                            const r: RDF.NamedNode = this.process(p.val); // returns NamedNode
                             q = N3.DataFactory.quad(
                                 N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
                                 N3.DataFactory.namedNode(p.decoratorMetadata.prop),
                                 r
                             );
                             this.quadsArr.push(q);
-                        });
-                    } else {
-                        const r: RDF.NamedNode = this.process(p.val); // returns NamedNode
+                        }
+
+                    } else if (enumTypeOpt) {
+                        const s: ISerializer = this.getOrCreateSerializer(enumTypeOpt.serializer);
                         q = N3.DataFactory.quad(
                             N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
                             N3.DataFactory.namedNode(p.decoratorMetadata.prop),
-                            r
+                            N3.DataFactory.literal(s.serialize(p.val), N3.DataFactory.namedNode(p.decoratorMetadata.xsdType))
+                        );
+                        this.quadsArr.push(q);
+
+                    } else {
+                        q = N3.DataFactory.quad(
+                            N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
+                            N3.DataFactory.namedNode(p.decoratorMetadata.prop),
+                            N3.DataFactory.literal(p.val, N3.DataFactory.namedNode(p.decoratorMetadata.xsdType))
                         );
                         this.quadsArr.push(q);
                     }
-
-                } else if (enumTypeOpt) {
-                    const s: ISerializer = this.getOrCreateSerializer(enumTypeOpt.serializer);
-                    q = N3.DataFactory.quad(
-                        N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
-                        N3.DataFactory.namedNode(p.decoratorMetadata.prop),
-                        N3.DataFactory.literal(s.serialize(p.val), N3.DataFactory.namedNode(p.decoratorMetadata.xsdType))
-                    );
-                    this.quadsArr.push(q);
-
-                } else {
-                    q = N3.DataFactory.quad(
-                        N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`),
-                        N3.DataFactory.namedNode(p.decoratorMetadata.prop),
-                        N3.DataFactory.literal(p.val, N3.DataFactory.namedNode(p.decoratorMetadata.xsdType))
-                    );
-                    this.quadsArr.push(q);
                 }
-            }
 
-            // console.log(q.object.datatype.value)
-        });
+                // console.log(q.object.datatype.value)
+            });
+
         return N3.DataFactory.namedNode(`${subject.prop}:${subject['val']}`);
+        }
     }
 
     private getTTLString(): string {

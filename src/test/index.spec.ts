@@ -5,7 +5,8 @@ import {RdfProperty} from '../main/annotations/RdfProperty';
 import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
-import {Addr, Calendar, Days, Per, Person, PersonMultipleDataTypes, personTTL, SuperBase} from './models/models';
+import {Addr, Calendar, Days, Per, PersonMultipleDataTypes, SuperBase} from './models/models';
+import {Address} from './models/oneToOneModels';
 
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
@@ -20,15 +21,7 @@ describe('Testing basic serialization functions', () => {
         p.buoyancy = 53.2;
 
         const b = RdfMapper.serialize(p);
-        console.log(b);
-
-        // const parser = new N3.Parser();
-        // parser.parse(b, (error, quad, prefixes) => {
-        //     if (quad)
-        //         console.log(quad);
-        //     else
-        //         console.log('# That\'s all, folks!', prefixes);
-        // });
+        // console.log(b);
 
     });
 
@@ -39,7 +32,7 @@ describe('Testing basic serialization functions', () => {
             address: 'http://xmlns.com/foaf/0.1/address/'
         })
         @RdfBean('foaf:Address')
-        class Address {
+        class Address1 {
             @RdfSubject('address')
             public uuid: string;
 
@@ -61,10 +54,10 @@ describe('Testing basic serialization functions', () => {
             public name: string;
 
             @RdfProperty({prop: 'person:hasAddress', clazz: Address})
-            public address: Address;
+            public address: Address1;
         }
 
-        const a = new Address();
+        const a = new Address1();
         a.uuid = 'address-uuid';
         a.streetName = 'Jasmine';
 
@@ -123,9 +116,19 @@ describe('Testing basic serialization functions', () => {
        const cal = new Calendar();
        cal.uuid = 'cal-uuid';
        cal.day = Days.Mon;
+    });
 
-        // const b = RdfMapper.serialize(cal);
-        // console.log(b);
+    it('Serialize Array', () => {
+        const addr1: Address = new Address();
+        addr1.uuid = 'addr1-uuid';
+        addr1.streetName = 'Zigg';
+
+        const addr2: Address = new Address();
+        addr2.uuid = 'addr2-uuid';
+        addr2.streetName = 'St Clair';
+
+        const r = RdfMapper.serialize([addr1, addr2]);
+        console.log(r);
     });
 
 });

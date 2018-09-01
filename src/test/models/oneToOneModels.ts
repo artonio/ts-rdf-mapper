@@ -9,7 +9,7 @@ import {XSDDataType} from '../../main/annotations/XSDDataType';
     address: 'http://xmlns.com/foaf/0.1/address/'
 })
 @RdfBean('foaf:Address')
-export class AddressOneToPerson {
+export class Address {
     @RdfSubject('address')
     public uuid: string;
 
@@ -22,7 +22,7 @@ export class AddressOneToPerson {
     person: 'http://example.com/Person/'
 })
 @RdfBean('foaf:Person')
-export class PersonOneToAddress {
+export class PersonHasAddress {
 
     @RdfSubject('person')
     public uuid: string;
@@ -30,8 +30,8 @@ export class PersonOneToAddress {
     @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
     public name: string;
 
-    @RdfProperty({prop: 'person:hasAddress', clazz: AddressOneToPerson})
-    public address: AddressOneToPerson;
+    @RdfProperty({prop: 'person:hasAddress', clazz: Address})
+    public address: Address;
 
 }
 
