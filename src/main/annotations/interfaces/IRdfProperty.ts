@@ -10,5 +10,8 @@ export interface IRdfProperty {
      */
     xsdType?: string;
 
-    enumOptions?: {enumType: any; serializer?: any; deserializer?: any};
+    serializer?: any;
+
+    deserializer?: any;
+
 }

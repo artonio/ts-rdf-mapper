@@ -21,7 +21,7 @@ describe('Testing basic serialization functions', () => {
         p.buoyancy = 53.2;
 
         const b = RdfMapper.serialize(p);
-        // console.log(b);
+        console.log(b);
 
     });
 
@@ -66,8 +66,8 @@ describe('Testing basic serialization functions', () => {
         p.name = 'John';
         p.address = a;
 
-        // const b = RdfMapper.serialize(p);
-        // console.log(b);
+        const b = RdfMapper.serialize(p);
+        console.log(b);
 
     });
 
@@ -116,6 +116,9 @@ describe('Testing basic serialization functions', () => {
        const cal = new Calendar();
        cal.uuid = 'cal-uuid';
        cal.day = Days.Mon;
+
+        const r = RdfMapper.serialize(cal);
+        console.log(r);
     });
 
     it('Serialize Array', () => {

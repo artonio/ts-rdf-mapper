@@ -131,7 +131,7 @@ export class Calendar {
     @RdfSubject('calendar')
     public uuid: string;
 
-    @RdfProperty({prop: 'foaf:day', xsdType: XSDDataType.XSD_STRING, enumOptions: {enumType: Days, serializer: DaysSerializer}})
+    @RdfProperty({prop: 'foaf:day', xsdType: XSDDataType.XSD_STRING, clazz: Days, serializer: DaysSerializer})
     public day: Days;
 
 }
