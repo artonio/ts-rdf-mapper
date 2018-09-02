@@ -58,6 +58,7 @@ export class SerializerProcessor {
                 const serializer = p.decoratorMetadata.serializer;
                 // ?subject ?predicate ?object
                 const predicate: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.prop);
+                const xsdDataType: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.xsdType);
 
                 // If value is set for the current key, process it
                 if (p.val) {
@@ -77,7 +78,7 @@ export class SerializerProcessor {
                             if (serializer)
                             {
                                 const s: ISerializer = this.getOrCreateSerializer(serializer);
-                                const object: RDF.Literal = N3.DataFactory.literal(s.serialize(p.val), N3.DataFactory.namedNode(p.decoratorMetadata.xsdType));
+                                const object: RDF.Literal = N3.DataFactory.literal(s.serialize(p.val), xsdDataType);
                                 q = this.createQuad(subject, predicate, object);
                                 this.quadsArr.push(q);
                             }
@@ -91,7 +92,7 @@ export class SerializerProcessor {
 
                     }
                     else {
-                        const objectLiteral: RDF.Literal = this.makeLiteral(p.val, N3.DataFactory.namedNode(p.decoratorMetadata.xsdType));
+                        const objectLiteral: RDF.Literal = this.makeLiteral(p.val, xsdDataType);
                         q = this.createQuad(subject, predicate, objectLiteral);
                         this.quadsArr.push(q);
                     }

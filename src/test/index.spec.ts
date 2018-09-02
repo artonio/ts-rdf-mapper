@@ -21,6 +21,14 @@ describe('Testing basic serialization functions', () => {
         p.buoyancy = 53.2;
 
         const b = RdfMapper.serialize(p);
+        expect(b).toContain(`person:123345dfx a foaf:Person;`);
+        expect(b).toContain(`person:name "Anton"^^xsd:string;`);
+        expect(b).toContain(`person:gender "M"^^xsd:string;`);
+        expect(b).toContain(`person:age "32"^^xsd:int;`);
+        expect(b).toContain(`person:isAdult "true"^^xsd:boolean;`);
+        expect(b).toContain(`person:weight "95.5"^^xsd:double;`);
+        expect(b).toContain(`person:height "198.5"^^xsd:long;`);
+        expect(b).toContain(`person:buoyancy "53.2"^^xsd:float.`);
         console.log(b);
 
     });
