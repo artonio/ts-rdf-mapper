@@ -29,7 +29,7 @@ export class SerializerProcessor {
         return this.getTTLString();
     }
 
-    private process<T>(target: T | T[]): RDF.NamedNode {
+    private process<T>(target: T | T[]): RDF.Term {
         if (Array.isArray(target)) {
             target.forEach((tar: T) => {
                 this.process(tar);
@@ -40,7 +40,12 @@ export class SerializerProcessor {
             const rdfSubjectDecorator: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);
 
             // ?subject ?predicate ?object
-            const subject: RDF.NamedNode = N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator.val}`);
+            let subject: RDF.Term;
+            if (rdfSubjectDecorator) {
+                subject = N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator.val}`);
+            } else {
+                subject = N3.DataFactory.blankNode();
+            }
 
             const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
             this.prefixes = {...prefixxes};
@@ -50,30 +55,30 @@ export class SerializerProcessor {
             this.quadsArr.push(resourceIdentifierQuad);
 
             const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', target);
-            properties.forEach((p: IRdfPropertyMetadata) => {
+            if (properties) {
+                properties.forEach((p: IRdfPropertyMetadata) => {
+                    // If clazz property is present then it is an Object
+                    const propertyClassType = p.decoratorMetadata.clazz;
+                    const serializer: { new(): ISerializer } = p.decoratorMetadata.serializer;
+                    // ?subject ?predicate ?object
+                    const predicate: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.prop);
+                    const xsdDataType: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.xsdType);
 
-                // If clazz property is present then it is an Object
-                const propertyClassType = p.decoratorMetadata.clazz;
-                const serializer: { new(): ISerializer } = p.decoratorMetadata.serializer;
-                // ?subject ?predicate ?object
-                const predicate: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.prop);
-                const xsdDataType: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.xsdType);
-
-                // If value is set for the current key, process it
-                if (p.val) {
-                    // If this is an Object
-                    if (propertyClassType) {
-                        this.processClazzAnnotatedPropertyValue(p.val, subject, predicate, xsdDataType, serializer);
+                    // If value is set for the current key, process it
+                    if (p.val) {
+                        // If this is an Object, clazz annotated
+                        if (propertyClassType) {
+                            this.processClazzAnnotatedPropertyValue(p.val, subject, predicate, xsdDataType, serializer);
+                        }
+                        // If not clazz annotated, then it's a literal
+                        else {
+                            this.processPrimitiveValue(p.val, subject, predicate, xsdDataType, serializer);
+                        }
                     }
-                    // If not clazz annotated, then it's a literal
-                    else {
-                        this.processPrimitiveValue(p.val, subject, predicate, xsdDataType, serializer);
-                    }
-                }
+                });
+            }
 
-            });
-
-        return N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator['val']}`);
+            return subject;
         }
     }
 
@@ -112,7 +117,7 @@ export class SerializerProcessor {
         }
         else
         {
-            const resultObject: RDF.NamedNode = this.process(value); // returns NamedNode
+            const resultObject: RDF.Term = this.process(value); // returns NamedNode
             const q = this.createQuad(subject, predicate, resultObject);
             this.quadsArr.push(q);
         }
@@ -120,7 +125,7 @@ export class SerializerProcessor {
 
     private processArrayOfObjectValues(values: any[], subject: RDF.Term, predicate: RDF.Term): void {
         values.forEach((prop: any) => {
-            const resultObject: RDF.NamedNode = this.process(prop);
+            const resultObject: RDF.Term = this.process(prop);
             const q = this.createQuad(subject, predicate, resultObject);
             this.quadsArr.push(q);
         });

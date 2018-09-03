@@ -8,6 +8,7 @@ import {RdfMapper} from '../main/RdfMapper';
 import {User} from './models/litralSerializer';
 import {Addr, Calendar, Days, Per, PersonMultipleDataTypes, SuperBase} from './models/models';
 import {Address} from './models/oneToOneModels';
+import {Recipe} from './models/recipes';
 
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
@@ -166,6 +167,13 @@ describe('Testing basic serialization functions', () => {
         u.birthDate = new Date('1995-12-17T03:24:00');
 
         const r = RdfMapper.serialize(u);
+        console.log(r);
+    });
+
+    it('Should serialize into a blank node', () => {
+        const recipe: Recipe = new Recipe();
+        recipe.recipeName = 'Cheesecake';
+        const r = RdfMapper.serialize(recipe);
         console.log(r);
     });
 
