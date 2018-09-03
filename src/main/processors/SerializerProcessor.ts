@@ -61,50 +61,13 @@ export class SerializerProcessor {
 
                 // If value is set for the current key, process it
                 if (p.val) {
-                    let q: RDF.Quad;
                     // If this is an Object
-                    if (propertyClassType)
-                    {
-                        if (Array.isArray(p.val))
-                        {
-                            p.val.forEach((prop: any) => {
-                                const resultObject: RDF.NamedNode = this.process(prop);
-                                q = this.createQuad(subject, predicate, resultObject);
-                                this.quadsArr.push(q);
-                            });
-                        }
-                        else
-                        {
-                            if (serializer)
-                            {
-                                const s: ISerializer = this.getOrCreateSerializer(serializer);
-                                const object: RDF.Literal = N3.DataFactory.literal(s.serialize(p.val), xsdDataType);
-                                q = this.createQuad(subject, predicate, object);
-                                this.quadsArr.push(q);
-                            }
-                            else
-                            {
-                                const resultObject: RDF.NamedNode = this.process(p.val); // returns NamedNode
-                                q = this.createQuad(subject, predicate, resultObject);
-                                this.quadsArr.push(q);
-                            }
-                        }
-
+                    if (propertyClassType) {
+                        this.processClazzAnnotatedPropertyValue(p.val, subject, predicate, xsdDataType, serializer);
                     }
                     // If not clazz annotated, then it's a literal
                     else {
-                        if (serializer)
-                        {
-                            const s: ISerializer = this.getOrCreateSerializer(serializer);
-                            const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(p.val), xsdDataType);
-                            q = this.createQuad(subject, predicate, objectLiteral);
-                            this.quadsArr.push(q);
-                        } else {
-                            const objectLiteral: RDF.Literal = this.makeLiteral(p.val, xsdDataType);
-                            q = this.createQuad(subject, predicate, objectLiteral);
-                            this.quadsArr.push(q);
-
-                        }
+                        this.processPrimitiveValue(p.val, subject, predicate, xsdDataType, serializer);
                     }
                 }
 
@@ -112,6 +75,55 @@ export class SerializerProcessor {
 
         return N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator['val']}`);
         }
+    }
+
+    private processClazzAnnotatedPropertyValue(value: any | any[], subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {
+        if (Array.isArray(value)) {
+            this.processArrayOfObjectValues(value, subject, predicate);
+        } else {
+            this.processObjectValue(value, subject, predicate, xsdDataType, serializer);
+        }
+    }
+
+    private processArrayOfPrimitiveValues(value: any[], subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {}
+
+    private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {
+        if (serializer)
+        {
+            const s: ISerializer = this.getOrCreateSerializer(serializer);
+            const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
+            const q = this.createQuad(subject, predicate, objectLiteral);
+            this.quadsArr.push(q);
+        } else {
+            const objectLiteral: RDF.Literal = this.makeLiteral(value, xsdDataType);
+            const q = this.createQuad(subject, predicate, objectLiteral);
+            this.quadsArr.push(q);
+
+        }
+    }
+
+    private processObjectValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any ): void {
+        if (serializer)
+        {
+            const s: ISerializer = this.getOrCreateSerializer(serializer);
+            const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
+            const q = this.createQuad(subject, predicate, objectLiteral);
+            this.quadsArr.push(q);
+        }
+        else
+        {
+            const resultObject: RDF.NamedNode = this.process(value); // returns NamedNode
+            const q = this.createQuad(subject, predicate, resultObject);
+            this.quadsArr.push(q);
+        }
+    }
+
+    private processArrayOfObjectValues(values: any[], subject: RDF.Term, predicate: RDF.Term): void {
+        values.forEach((prop: any) => {
+            const resultObject: RDF.NamedNode = this.process(prop);
+            const q = this.createQuad(subject, predicate, resultObject);
+            this.quadsArr.push(q);
+        });
     }
 
     private makeLiteral(value: string | number, languageOrDatatype?: string | RDF.NamedNode): RDF.Literal {

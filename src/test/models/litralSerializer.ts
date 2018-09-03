@@ -15,7 +15,6 @@ export class BirthDateSerializer implements ISerializer {
     serialize(value: Date): string {
         return value.toISOString();
     }
-
 }
 
 @RdfNamespaces({
@@ -30,6 +29,6 @@ export class User {
     @RdfProperty({prop: 'user:registrationDate', xsdType: XSDDataType.XSD_DATE_TIME, serializer: RegistrationDateSerializer})
     public regDate: number;
 
-    @RdfProperty({prop: 'user:birthday', xsdType: XSDDataType.XSD_DATE_TIME, serializer: BirthDateSerializer})
+    @RdfProperty({prop: 'user:birthday', xsdType: XSDDataType.XSD_DATE_TIME, serializer: BirthDateSerializer, clazz: Date})
     public birthDate: Date;
 }
