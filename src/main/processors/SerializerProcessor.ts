@@ -21,10 +21,9 @@ export class SerializerProcessor {
     constructor() {
     }
 
-    public serialize<T>(target: T | T[]) {
+    public serialize<T>(target: T | T[]): string {
         this.process(target);
         this.sortQuads(this.quadsArr);
-        // console.log(this.quadsArr);
         this.n3Writer = N3.Writer({prefixes: this.prefixes});
         this.n3Writer.addQuads(this.quadsArr);
         return this.getTTLString();
@@ -55,7 +54,7 @@ export class SerializerProcessor {
 
                 // If clazz property is present then it is an Object
                 const propertyClassType = p.decoratorMetadata.clazz;
-                const serializer = p.decoratorMetadata.serializer;
+                const serializer: { new(): ISerializer } = p.decoratorMetadata.serializer;
                 // ?subject ?predicate ?object
                 const predicate: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.prop);
                 const xsdDataType: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.xsdType);
@@ -63,6 +62,7 @@ export class SerializerProcessor {
                 // If value is set for the current key, process it
                 if (p.val) {
                     let q: RDF.Quad;
+                    // If this is an Object
                     if (propertyClassType)
                     {
                         if (Array.isArray(p.val))
@@ -91,10 +91,20 @@ export class SerializerProcessor {
                         }
 
                     }
+                    // If not clazz annotated, then it's a literal
                     else {
-                        const objectLiteral: RDF.Literal = this.makeLiteral(p.val, xsdDataType);
-                        q = this.createQuad(subject, predicate, objectLiteral);
-                        this.quadsArr.push(q);
+                        if (serializer)
+                        {
+                            const s: ISerializer = this.getOrCreateSerializer(serializer);
+                            const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(p.val), xsdDataType);
+                            q = this.createQuad(subject, predicate, objectLiteral);
+                            this.quadsArr.push(q);
+                        } else {
+                            const objectLiteral: RDF.Literal = this.makeLiteral(p.val, xsdDataType);
+                            q = this.createQuad(subject, predicate, objectLiteral);
+                            this.quadsArr.push(q);
+
+                        }
                     }
                 }
 

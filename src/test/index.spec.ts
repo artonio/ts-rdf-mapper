@@ -5,6 +5,7 @@ import {RdfProperty} from '../main/annotations/RdfProperty';
 import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
+import {User} from './models/litralSerializer';
 import {Addr, Calendar, Days, Per, PersonMultipleDataTypes, SuperBase} from './models/models';
 import {Address} from './models/oneToOneModels';
 
@@ -29,7 +30,7 @@ describe('Testing basic serialization functions', () => {
         expect(b).toContain(`person:weight "95.5"^^xsd:double;`);
         expect(b).toContain(`person:height "198.5"^^xsd:long;`);
         expect(b).toContain(`person:buoyancy "53.2"^^xsd:float.`);
-        console.log(b);
+        // console.log(b);
 
     });
 
@@ -75,7 +76,13 @@ describe('Testing basic serialization functions', () => {
         p.address = a;
 
         const b = RdfMapper.serialize(p);
-        console.log(b);
+        expect(b).toContain(`person:person-uuid a foaf:Person;`);
+        expect(b).toContain(`person:name "John"^^xsd:string;`);
+        expect(b).toContain(`person:hasAddress address:address-uuid.`);
+        expect(b).toContain(`address:address-uuid a foaf:Address;`);
+        expect(b).toContain(`address:streetName "Jasmine"^^xsd:string.`);
+
+        // console.log(b);
 
     });
 
@@ -116,8 +123,11 @@ describe('Testing basic serialization functions', () => {
         sb.baseProp = 'baseValue';
         sb.extendedProp = 'extendedValue';
 
-        // const b = RdfMapper.serialize(sb);
-        // console.log(b);
+        const r = RdfMapper.serialize(sb);
+        expect(r).toContain(`foaf:inheritance-uuid a foaf:SuperBase;`);
+        expect(r).toContain(`foaf:baseProp "baseValue"^^xsd:string;`);
+        expect(r).toContain(`foaf:extendedProp "extendedValue"^^xsd:string.`);
+        // console.log(r);
     });
 
     it('Serialize Enums', () => {
@@ -126,7 +136,10 @@ describe('Testing basic serialization functions', () => {
        cal.day = Days.Mon;
 
         const r = RdfMapper.serialize(cal);
-        console.log(r);
+        // console.log(r);
+
+        expect(r).toContain(`calendar:cal-uuid a foaf:Calendar;`);
+        expect(r).toContain(`foaf:day "Mon"^^xsd:string.`);
     });
 
     it('Serialize Array', () => {
@@ -139,6 +152,20 @@ describe('Testing basic serialization functions', () => {
         addr2.streetName = 'St Clair';
 
         const r = RdfMapper.serialize([addr1, addr2]);
+        expect(r).toContain(`address:addr2-uuid a foaf:Address;`);
+        expect(r).toContain(`address:streetName "St Clair"^^xsd:string.`);
+        expect(r).toContain(`address:addr1-uuid a foaf:Address;`);
+        expect(r).toContain(`address:streetName "Zigg"^^xsd:string.`);
+        // console.log(r);
+    });
+
+    it('Serialize literal with customs serializer', () => {
+        const u: User = new User();
+        u.uuid = 'anton';
+        u.regDate = new Date().getTime();
+        u.birthDate = new Date('1995-12-17T03:24:00');
+
+        const r = RdfMapper.serialize(u);
         console.log(r);
     });
 

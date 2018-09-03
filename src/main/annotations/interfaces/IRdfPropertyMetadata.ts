@@ -8,7 +8,7 @@ export interface IRdfPropertyMetadata {
     /**
      * @val - This value is set when the property is set
      */
-    val: string;
+    val: any;
     /**
      * @decoratorMetadata - actual decorator metadata
      */
