@@ -1,4 +1,3 @@
 export interface IRdfNamespaces {
-    prefix: string;
-    uri: string;
+    [key: string]: string;
 }

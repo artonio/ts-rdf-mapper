@@ -1,7 +1,8 @@
-import {IRdfProperty} from './interfaces/IRdfProperty';
 import 'reflect-metadata';
+import {IRdfProperty} from './interfaces/IRdfProperty';
 import {IRdfPropertyMetadata} from './interfaces/IRdfPropertyMetadata';
 
+// Various examples of decorators, just some playground functions
 export function logClass(target: any) {
 
     // save a reference to the original constructor
@@ -9,9 +10,9 @@ export function logClass(target: any) {
 
     // a utility function to generate instances of a class
     function construct(constructor, args) {
-        let c: any = function () {
+        const c: any = function () {
             return constructor.apply(this, args);
-        }
+        };
         c.prototype = constructor.prototype;
         return new c();
     }
@@ -20,7 +21,7 @@ export function logClass(target: any) {
     const f: any = function (...args) {
         console.log('New: ' + original.name);
         return construct(original, args);
-    }
+    };
 
     // copy prototype so intanceof operator still works
     f.prototype = original.prototype;
@@ -36,9 +37,9 @@ export const logClazz = (prop: string ) => {
 
         // a utility function to generate instances of a class
         function construct(constructor, args) {
-            let c: any = function () {
+            const c: any = function () {
                 return constructor.apply(this, args);
-            }
+            };
             c.prototype = constructor.prototype;
             return new c();
         }
@@ -47,7 +48,7 @@ export const logClazz = (prop: string ) => {
         const f: any = function (...args) {
             console.log('New: ' + original.name);
             return construct(original, args);
-        }
+        };
 
         // copy prototype so intanceof operator still works
         f.prototype = original.prototype;
@@ -115,7 +116,7 @@ export const logProperty = (prop: IRdfProperty, clazz: any) => {
         };
 
         if (delete target[key]) {
-            console.log('delete called')
+            console.log('delete called');
             Reflect.defineProperty(target, key, {
                 get: getter,
                 set: setter,
@@ -125,5 +126,4 @@ export const logProperty = (prop: IRdfProperty, clazz: any) => {
         }
 
     };
-}
-
+};

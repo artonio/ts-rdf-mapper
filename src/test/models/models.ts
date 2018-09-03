@@ -1,14 +1,48 @@
+import {ISerializer} from '../../main/annotations/interfaces/ISerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
 import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {RdfSubject} from '../../main/annotations/RdfSubject';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'},
-    {prefix: 'address', uri: 'http://xmlns.com/foaf/0.1/address/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
+@RdfBean('foaf:Person')
+export class PersonMultipleDataTypes {
+
+    @RdfSubject('person')
+    public uuid: string;
+
+    @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
+    public name: string;
+
+    @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})
+    public gender: string;
+
+    @RdfProperty({prop: 'person:age', xsdType: XSDDataType.XSD_INT})
+    public age: number;
+
+    @RdfProperty({prop: 'person:isAdult', xsdType: XSDDataType.XSD_BOOLEAN})
+    public isAdult: boolean;
+
+    @RdfProperty({prop: 'person:weight', xsdType: XSDDataType.XSD_DOUBLE})
+    public weight: number;
+
+    @RdfProperty({prop: 'person:height', xsdType: XSDDataType.XSD_LONG})
+    public height: number;
+
+    @RdfProperty({prop: 'person:buoyancy', xsdType: XSDDataType.XSD_FLOAT})
+    public buoyancy: number;
+
+}
+
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/',
+    address: 'http://xmlns.com/foaf/0.1/address/'
+})
 @RdfBean('foaf:Address')
 export class Addr {
     @RdfSubject('address')
@@ -21,10 +55,10 @@ export class Addr {
     public houseNum: number;
 }
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
 @RdfBean('foaf:Person')
 export class Per {
     @RdfSubject('person')
@@ -39,10 +73,10 @@ export abstract class Base {
     baseProp: string;
 }
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
 @RdfBean('foaf:SuperBase')
 export class SuperBase extends Base {
     @RdfSubject('foaf')
@@ -52,10 +86,10 @@ export class SuperBase extends Base {
     extendedProp: string;
 }
 
-@RdfNamespaces([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'}
-])
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
 @RdfBean('foaf:Person')
 export class Person {
     @RdfSubject('person')
@@ -78,6 +112,30 @@ export class Person {
 
 }
 
+export class DaysSerializer implements ISerializer {
+    serialize(value: Days): string {
+        return `${Days[value]}`;
+    }
+}
+
+export enum Days {
+    Sun, Mon, Tues, Wed, Thurs, Fri, Sat
+}
+
+@RdfNamespaces({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    calendar: 'http://example.com/Calendar/'
+})
+@RdfBean('foaf:Calendar')
+export class Calendar {
+    @RdfSubject('calendar')
+    public uuid: string;
+
+    @RdfProperty({prop: 'foaf:day', xsdType: XSDDataType.XSD_STRING, clazz: Days, serializer: DaysSerializer})
+    public day: Days;
+
+}
+
 export const personTTL = `
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
@@ -89,4 +147,19 @@ person:1234567      a                       foaf:Person ;
         foaf:nick               "hulk" ;
         foaf:surname            "Banner" ;
         foaf:title              "Mr" .
+`;
+
+export const ttlMultipleTypes = `
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix person: <http://example.com/Person/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+person:123345dfx a foaf:Person;
+    person:name "Anton"^^xsd:string;
+    person:gender "M"^^xsd:string;
+    person:age "32"^^xsd:int;
+    person:isAdult "true"^^xsd:boolean;
+    person:weight "95.5"^^xsd:double;
+    person:height "198.5"^^xsd:long;
+    person:buoyancy "53.2"^^xsd:float.
 `;

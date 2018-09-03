@@ -12,7 +12,8 @@
     "test-karma": "node_modules/.bin/karma start ./karma.conf.js",
     "tslint": "tslint --project ./tsconfig.json --type-check --fix",
     "lint": "npm run tslint",
-    "build-test": "node_modules/.bin/tsc -p . && node_modules/.bin/jasmine-node bin --verbose --junitreport --noColor"
+    "build-test": "node_modules/.bin/tsc -p . && node_modules/.bin/jasmine-node bin --verbose --junitreport --noColor",
+    "testDebug": "node ./node_modules/jasmine/bin/jasmine.js bin/src/test/index.spec.js"
   },
   "keywords": [
     "RDF",
@@ -45,5 +46,8 @@
     "rollup-plugin-typescript": "~0.8.1",
     "tslint": "~5.5.0",
     "typings": "^0.8.1"
+  },
+  "dependencies": {
+    "@types/n3": "^1.0.0"
   }
 }

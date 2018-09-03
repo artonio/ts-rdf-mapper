@@ -1,90 +1,141 @@
 import * as N3 from 'n3';
+import {N3Writer} from 'n3';
+import * as RDF from 'rdf-js';
 import 'reflect-metadata';
 import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
+import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
+import {ISerializer} from '../annotations/interfaces/ISerializer';
 import {Utils} from '../Utils';
 
 export class SerializerProcessor {
 
-    objectToBeSerialized: any;
     // N3 writer
-    n3Writer: any;
+    n3Writer: N3Writer;
+    quadsArr: RDF.Quad[] = [];
+    prefixes: N3.Prefixes = {};
+    serializers: any = {};
 
-    constructor(target: any) {
-        this.objectToBeSerialized = target;
-        this.n3Writer = N3.Writer();
+    private readonly xsdType: RDF.NamedNode = N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+
+    constructor() {
     }
 
-    public serialize(target: any) {
+    public serialize<T>(target: T | T[]): string {
         this.process(target);
+        this.sortQuads(this.quadsArr);
+        this.n3Writer = N3.Writer({prefixes: this.prefixes});
+        this.n3Writer.addQuads(this.quadsArr);
         return this.getTTLString();
     }
 
-    private process(target: any) {
-        const ns: IRdfNamespaces[] = Reflect.getMetadata('RdfNamespaces', target);
-        const beanType: string = Reflect.getMetadata('RdfBean', target);
-        const subject: {key: string; val: string; prop: string} = Reflect.getMetadata('RdfSubject', target);
-        // console.log('process')
-        // console.log(target[subject.key]);
+    private process<T>(target: T | T[]): RDF.NamedNode {
+        if (Array.isArray(target)) {
+            target.forEach((tar: T) => {
+                this.process(tar);
+            });
+        } else {
+            const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', target);
+            const beanType: string = Reflect.getMetadata('RdfBean', target);
+            const rdfSubjectDecorator: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);
 
-        const prefixxes = this.getN3NsPrefixObject(ns);
-        // const writer = N3.Writer({ prefixes: prefixxes });
-        this.n3Writer.addPrefixes(prefixxes);
+            // ?subject ?predicate ?object
+            const subject: RDF.NamedNode = N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator.val}`);
 
-        const { DataFactory } = N3;
-        const { namedNode, literal, defaultGraph, quad } = DataFactory;
-        this.n3Writer.addQuad(
-            namedNode(`${subject.prop}:${subject['val']}`),
-            namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            namedNode(beanType)
-        );
+            const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
+            this.prefixes = {...prefixxes};
+            // this.n3Writer.addPrefixes(prefixxes); waiting for DefinitelyTyped merge
 
-        const properties: IRdfPropertyMetadata[] = Reflect
-                                            .getMetadata('RdfProperty', target);
-        properties.forEach((p: IRdfPropertyMetadata) => {
+            const resourceIdentifierQuad: RDF.Quad = this.createQuad(subject, this.xsdType, N3.DataFactory.namedNode(beanType));
+            this.quadsArr.push(resourceIdentifierQuad);
 
-            const propertyClassType = p.decoratorMetadata.clazz;
+            const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', target);
+            properties.forEach((p: IRdfPropertyMetadata) => {
 
-            if (p.val) {
-                let q;
-                if (propertyClassType) {
-                    if (Array.isArray(p.val)) {
-                        // console.log(`Value: ${p.val} is an Array`);
-                        p.val.forEach((prop: any) => {
-                            const r = this.process(prop); // returns NamedNode
-                            q = quad(
-                                namedNode(`${subject.prop}:${subject['val']}`),
-                                namedNode(p.decoratorMetadata.prop),
-                                r
-                            );
-                            this.n3Writer.addQuad(q);
-                        });
-                    } else {
-                        const r = this.process(p.val); // returns NamedNode
-                        q = quad(
-                            namedNode(`${subject.prop}:${subject['val']}`),
-                            namedNode(p.decoratorMetadata.prop),
-                            r
-                        );
-                        this.n3Writer.addQuad(q);
+                // If clazz property is present then it is an Object
+                const propertyClassType = p.decoratorMetadata.clazz;
+                const serializer: { new(): ISerializer } = p.decoratorMetadata.serializer;
+                // ?subject ?predicate ?object
+                const predicate: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.prop);
+                const xsdDataType: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.xsdType);
 
+                // If value is set for the current key, process it
+                if (p.val) {
+                    // If this is an Object
+                    if (propertyClassType) {
+                        this.processClazzAnnotatedPropertyValue(p.val, subject, predicate, xsdDataType, serializer);
                     }
-
-                } else {
-                    q = quad(
-                        namedNode(`${subject.prop}:${subject['val']}`),
-                        namedNode(p.decoratorMetadata.prop),
-                        literal(p.val, {value: p.decoratorMetadata.xsdType})
-                    );
-                    this.n3Writer.addQuad(
-                        q
-                    );
+                    // If not clazz annotated, then it's a literal
+                    else {
+                        this.processPrimitiveValue(p.val, subject, predicate, xsdDataType, serializer);
+                    }
                 }
-            }
 
-            // console.log(q.object.datatype.value)
+            });
+
+        return N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator['val']}`);
+        }
+    }
+
+    private processClazzAnnotatedPropertyValue(value: any | any[], subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {
+        if (Array.isArray(value)) {
+            this.processArrayOfObjectValues(value, subject, predicate);
+        } else {
+            this.processObjectValue(value, subject, predicate, xsdDataType, serializer);
+        }
+    }
+
+    private processArrayOfPrimitiveValues(value: any[], subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {}
+
+    private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {
+        if (serializer)
+        {
+            const s: ISerializer = this.getOrCreateSerializer(serializer);
+            const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
+            const q = this.createQuad(subject, predicate, objectLiteral);
+            this.quadsArr.push(q);
+        } else {
+            const objectLiteral: RDF.Literal = this.makeLiteral(value, xsdDataType);
+            const q = this.createQuad(subject, predicate, objectLiteral);
+            this.quadsArr.push(q);
+
+        }
+    }
+
+    private processObjectValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any ): void {
+        if (serializer)
+        {
+            const s: ISerializer = this.getOrCreateSerializer(serializer);
+            const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
+            const q = this.createQuad(subject, predicate, objectLiteral);
+            this.quadsArr.push(q);
+        }
+        else
+        {
+            const resultObject: RDF.NamedNode = this.process(value); // returns NamedNode
+            const q = this.createQuad(subject, predicate, resultObject);
+            this.quadsArr.push(q);
+        }
+    }
+
+    private processArrayOfObjectValues(values: any[], subject: RDF.Term, predicate: RDF.Term): void {
+        values.forEach((prop: any) => {
+            const resultObject: RDF.NamedNode = this.process(prop);
+            const q = this.createQuad(subject, predicate, resultObject);
+            this.quadsArr.push(q);
         });
-        return namedNode(`${subject.prop}:${subject['val']}`);
+    }
+
+    private makeLiteral(value: string | number, languageOrDatatype?: string | RDF.NamedNode): RDF.Literal {
+        return N3.DataFactory.literal(value, languageOrDatatype);
+    }
+
+    private createQuad(subject: RDF.Term, predicate: RDF.Term, object: RDF.Term): RDF.Quad {
+        return N3.DataFactory.quad(
+            subject,
+            predicate,
+            object
+        );
     }
 
     private getTTLString(): string {
@@ -96,12 +147,36 @@ export class SerializerProcessor {
         return result;
     }
 
-    private getN3NsPrefixObject(ns: IRdfNamespaces[]) {
-        const r = {};
-        ns.forEach((namespace: IRdfNamespaces) => {
-            r[namespace.prefix] = namespace.uri;
+    private getN3NsPrefixObject(ns: IRdfNamespaces): N3.Prefixes {
+        const r: N3.Prefixes = {};
+
+        const keys: string[] = Object.keys(ns);
+        keys.forEach(key => {
+            r[key] = N3.DataFactory.namedNode(ns[key]);
         });
-        r['xsd'] = 'http://www.w3.org/2001/XMLSchema#';
+
+        r['xsd'] = N3.DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#');
         return r;
+    }
+
+    private sortQuads(arr: RDF.Quad[]) {
+        arr.sort((a, b) => {
+            if (a.subject.value < b.subject.value) {
+                return 1;
+            }
+            if (a.subject.value > b.subject.value) {
+                return -1;
+            }
+            return 0;
+        });
+    }
+
+    /**
+     * Checks to see if the serializer already exists or not.
+     * If not, creates a new one and caches it, returns the
+     * cached instance otherwise.
+     */
+    private getOrCreateSerializer(type: any): any {
+        return Utils.getCachedType(type, this.serializers);
     }
 }

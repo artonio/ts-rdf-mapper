@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import {IRdfNamespaces} from './interfaces/IRdfNamespaces';
 
-export const RdfNamespaces = (prefixValuePairs?: IRdfNamespaces[]) => {
+export const RdfNamespaces = (prefixes?: IRdfNamespaces) => {
     return (target: any) => {
 
         // save a reference to the original constructor
@@ -11,12 +11,6 @@ export const RdfNamespaces = (prefixValuePairs?: IRdfNamespaces[]) => {
         function construct(constructor, args) {
             const c: any = function () {
                 const keys = Object.keys(constructor.prototype);
-                // We delete all key value pairs from the object to avaid multiple instances
-                // sharing the same properties
-                // keys.forEach(key => {
-                //     delete constructor.prototype[key];
-                // });
-                // return new constructor();
                 return constructor.apply(this, args);
                 // const re = constructor.apply(this.constructor, args);
                 // return constructor.apply(this.constructor, args);
@@ -38,7 +32,7 @@ export const RdfNamespaces = (prefixValuePairs?: IRdfNamespaces[]) => {
 
         // copy prototype so intanceof operator still works
         f.prototype = original.prototype;
-        Reflect.defineMetadata('RdfNamespaces', prefixValuePairs, f.prototype);
+        Reflect.defineMetadata('RdfNamespaces', prefixes, f.prototype);
 
         // return new constructor (will override original)
         return f;
