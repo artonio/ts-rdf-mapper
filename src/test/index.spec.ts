@@ -8,7 +8,7 @@ import {RdfMapper} from '../main/RdfMapper';
 import {User} from './models/litralSerializer';
 import {Addr, Calendar, Days, Per, PersonMultipleDataTypes, SuperBase} from './models/models';
 import {Address} from './models/oneToOneModels';
-import {Recipe} from './models/recipes';
+import {Recipe, Video} from './models/recipes';
 
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
@@ -173,6 +173,10 @@ describe('Testing basic serialization functions', () => {
     it('Should serialize into a blank node', () => {
         const recipe: Recipe = new Recipe();
         recipe.recipeName = 'Cheesecake';
+
+        const video: Video = new Video();
+        video.name = 'Japanese Cheesecake instructions';
+        recipe.video = video;
         const r = RdfMapper.serialize(recipe);
         console.log(r);
     });

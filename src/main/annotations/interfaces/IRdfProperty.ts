@@ -1,6 +1,3 @@
-// https://stackoverflow.com/questions/39622778/what-is-new-in-typescript
-import {ISerializer} from './ISerializer';
-
 export interface IRdfProperty {
     // can be used to identify type of object at runtime (needed for deserialization)
     clazz?: any;
