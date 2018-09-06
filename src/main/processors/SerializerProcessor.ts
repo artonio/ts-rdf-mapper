@@ -1,12 +1,11 @@
 import * as N3 from 'n3';
-import {N3Writer, Util} from 'n3';
-import {BlankTriple} from 'n3';
+import {N3Writer} from 'n3';
 import * as RDF from 'rdf-js';
 import 'reflect-metadata';
 import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
+import {IRDFSerializer} from '../annotations/interfaces/IRDFSerializer';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
-import {ISerializer} from '../annotations/interfaces/ISerializer';
 import {Utils} from '../Utils';
 
 export class SerializerProcessor {
@@ -61,7 +60,7 @@ export class SerializerProcessor {
                 properties.forEach((p: IRdfPropertyMetadata) => {
                     // If clazz property is present then it is an Object
                     const propertyClassType = p.decoratorMetadata.clazz;
-                    const serializer: { new(): ISerializer } = p.decoratorMetadata.serializer;
+                    const serializer: IRDFSerializer = p.decoratorMetadata.serializer;
                     // ?subject ?predicate ?object
                     const predicate: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.prop);
                     const xsdDataType: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.xsdType);
@@ -100,10 +99,19 @@ export class SerializerProcessor {
     private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {
         if (serializer)
         {
-            const s: ISerializer = this.getOrCreateSerializer(serializer);
-            const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
-            const q = this.createQuad(subject, predicate, objectLiteral);
-            this.quadsArr.push(q);
+            const s: any = this.getOrCreateSerializer(serializer);
+            if (s.isBnodeSerializer) {
+                this.prefixes = {...this.prefixes, ...s.prefixes};
+                const q = this.createQuad(subject, predicate, s.subject);
+                this.quadsArr.push(...s.serialize(value));
+                this.quadsArr.push(q);
+            } else {
+                const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
+                const q = this.createQuad(subject, predicate, objectLiteral);
+                this.quadsArr.push(q);
+
+            }
+
         } else {
             const objectLiteral: RDF.Literal = this.makeLiteral(value, xsdDataType);
             const q = this.createQuad(subject, predicate, objectLiteral);
@@ -114,7 +122,7 @@ export class SerializerProcessor {
     private processObjectValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {
         if (serializer)
         {
-            const s: ISerializer = this.getOrCreateSerializer(serializer);
+            const s: IRDFSerializer = this.getOrCreateSerializer(serializer);
             const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
             const q = this.createQuad(subject, predicate, objectLiteral);
             this.quadsArr.push(q);

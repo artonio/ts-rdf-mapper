@@ -1,3 +1,3 @@
-export interface ISerializer {
+export interface IRDFSerializer {
     serialize(value: any): string;
 }

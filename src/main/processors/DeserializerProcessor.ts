@@ -17,7 +17,7 @@ export class DeserializerProcessor {
     constructor() {}
 
     public async deserialize<T>(type: { new(): T }, ttlData: string): Promise<T> {
-        let qa: QuadsAndPrefixes
+        let qa: QuadsAndPrefixes;
         try {
             qa = await this.getQuadsAndPrefixes(ttlData);
         } catch (e) {

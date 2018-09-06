@@ -9,6 +9,7 @@ import {User} from './models/litralSerializer';
 import {Addr, Calendar, Days, Per, PersonMultipleDataTypes, SuperBase} from './models/models';
 import {Address} from './models/oneToOneModels';
 import {Recipe, Video} from './models/recipes';
+import {UserJsonObject} from './models/serializeJsonObj';
 
 describe('Testing basic serialization functions', () => {
     it('Should serialize basic types', () => {
@@ -178,6 +179,14 @@ describe('Testing basic serialization functions', () => {
         video.name = 'Japanese Cheesecake instructions';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
+        console.log(r);
+    });
+
+    it('Serialize json with dynamic serializer', () => {
+        const u: UserJsonObject = new UserJsonObject();
+        u.name = 'Anton';
+        u.address = {streetName: 'St Clair', streetNumber: 223, isRegistered: true};
+        const r = RdfMapper.serialize(u);
         console.log(r);
     });
 

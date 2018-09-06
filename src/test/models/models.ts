@@ -1,4 +1,4 @@
-import {ISerializer} from '../../main/annotations/interfaces/ISerializer';
+import {IRDFSerializer} from '../../main/annotations/interfaces/IRDFSerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
 import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
@@ -112,7 +112,7 @@ export class Person {
 
 }
 
-export class DaysSerializer implements ISerializer {
+export class DaysSerializer implements IRDFSerializer {
     serialize(value: Days): string {
         return `${Days[value]}`;
     }

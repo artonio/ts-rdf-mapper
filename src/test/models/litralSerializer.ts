@@ -1,17 +1,17 @@
-import {ISerializer} from '../../main/annotations/interfaces/ISerializer';
+import {IRDFSerializer} from '../../main/annotations/interfaces/IRDFSerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
 import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {RdfSubject} from '../../main/annotations/RdfSubject';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
 
-export class RegistrationDateSerializer implements ISerializer {
+export class RegistrationDateSerializer implements IRDFSerializer {
     serialize(value: number): string {
         return new Date(value).toISOString();
     }
 }
 
-export class BirthDateSerializer implements ISerializer {
+export class BirthDateSerializer implements IRDFSerializer {
     serialize(value: Date): string {
         return value.toISOString();
     }
