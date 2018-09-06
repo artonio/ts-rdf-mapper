@@ -1,4 +1,9 @@
-import {AbstractBNodeSerializer, RDFQuad} from '../../main/annotations/interfaces/AbstractBNodeSerializer';
+import {
+    AbstractBNodeSerializer,
+    RDFLiteral,
+    RDFQuad,
+    RDFResourceIRI
+} from '../../main/annotations/interfaces/AbstractBNodeSerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
 import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
@@ -21,8 +26,8 @@ export class AddressSerializer extends AbstractBNodeSerializer {
         const quads: RDFQuad[] = [];
 
         Object.keys(value).forEach(key => {
-            const predicate = this.makePredicate(`address:${key}`);
-            let obj;
+            const predicate: RDFResourceIRI = this.makePredicate(`address:${key}`);
+            let obj: RDFLiteral;
             // If value is not a number
             if (isNaN(value[key])) {
                 obj = this.makeLiteralWithDataType(value[key], 'xsd:string');
