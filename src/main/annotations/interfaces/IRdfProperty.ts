@@ -10,6 +10,15 @@ export interface IRdfProperty {
      */
     xsdType?: string;
 
+    /**
+     * language tag e.g. "someString"@en
+     */
+    lang?: string;
+
+    /**
+     * Serializer must either extend AbstractBNodeSerializer class or implement the IRDFSerializer interface
+     */
+
     serializer?: any;
 
     deserializer?: any;

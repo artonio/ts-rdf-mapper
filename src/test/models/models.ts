@@ -18,6 +18,9 @@ export class PersonMultipleDataTypes {
     @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
     public name: string;
 
+    @RdfProperty({prop: 'person:germanName', lang: 'de'})
+    public germanName: string;
+
     @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})
     public gender: string;
 

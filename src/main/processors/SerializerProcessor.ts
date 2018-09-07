@@ -62,8 +62,20 @@ export class SerializerProcessor {
                     const propertyClassType = p.decoratorMetadata.clazz;
                     const serializer: IRDFSerializer = p.decoratorMetadata.serializer;
                     // ?subject ?predicate ?object
-                    const predicate: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.prop);
-                    const xsdDataType: RDF.NamedNode = N3.DataFactory.namedNode(p.decoratorMetadata.xsdType);
+                    const rdfPredicateString: string = p.decoratorMetadata.prop;
+                    let predicate: RDF.NamedNode;
+                    if (rdfPredicateString) {
+                        predicate = N3.DataFactory.namedNode(rdfPredicateString);
+                    }
+                    const xsdDataTypeString: string = p.decoratorMetadata.xsdType;
+                    let xsdDataType: RDF.NamedNode;
+                    if (xsdDataTypeString) {
+                        xsdDataType = N3.DataFactory.namedNode(xsdDataTypeString);
+                    }
+                    const lang: string = p.decoratorMetadata.lang;
+                    if (lang && xsdDataTypeString) {
+                        throw new Error(`Key ${p.key} cannot have both lang and xsdType present inside the decorator`);
+                    }
 
                     // If value is set for the current key, process it
                     if (p.val) {
@@ -73,7 +85,7 @@ export class SerializerProcessor {
                         }
                         // If not clazz annotated, then it's a literal
                         else {
-                            this.processPrimitiveValue(p.val, subject, predicate, xsdDataType, serializer);
+                            this.processPrimitiveValue(p.val, subject, predicate, xsdDataType, lang, serializer);
                         }
                     }
                 });
@@ -96,7 +108,7 @@ export class SerializerProcessor {
 
     private processArrayOfPrimitiveValues(value: any[], subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {}
 
-    private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {
+    private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, lang: string, serializer?: any): void {
         if (serializer)
         {
             const s: any = this.getOrCreateSerializer(serializer);
@@ -106,14 +118,26 @@ export class SerializerProcessor {
                 this.quadsArr.push(...s.serialize(value));
                 this.quadsArr.push(q);
             } else {
-                const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
+                let objectLiteral: RDF.Literal;
+                if (lang) {
+                    objectLiteral = this.makeLiteral(s.serialize(value), lang);
+                }
+                if (xsdDataType) {
+                    objectLiteral = this.makeLiteral(s.serialize(value), xsdDataType);
+                }
                 const q = this.createQuad(subject, predicate, objectLiteral);
                 this.quadsArr.push(q);
 
             }
 
         } else {
-            const objectLiteral: RDF.Literal = this.makeLiteral(value, xsdDataType);
+            let objectLiteral: RDF.Literal;
+            if (lang) {
+                objectLiteral = this.makeLiteral(value, lang);
+            }
+            if (xsdDataType) {
+                objectLiteral = this.makeLiteral(value, xsdDataType);
+            }
             const q = this.createQuad(subject, predicate, objectLiteral);
             this.quadsArr.push(q);
         }
