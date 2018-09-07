@@ -29,15 +29,16 @@ export class AddressSerializer extends AbstractBNodeSerializer {
             const predicate: RDFResourceIRI = this.makePredicate(`address:${key}`);
             let obj: RDFLiteral;
             // If value is not a number
-            if (isNaN(value[key])) {
+            // if (isNaN(value[key])) {
+            if (typeof (value[key]) === 'string') {
                 obj = this.makeLiteralWithDataType(value[key], 'xsd:string');
             }
             // If value is boolean
-            else if (typeof (value[key]) === 'boolean') {
+            if (typeof (value[key]) === 'boolean') {
                 obj = this.makeLiteralWithDataType(value[key], 'xsd:boolean');
             }
             // if value is number
-            else {
+            if (typeof (value[key]) === 'number') {
                 obj = this.makeLiteralWithDataType(value[key], 'xsd:integer');
             }
             quads.push(this.createQuad(this.subject, predicate, obj));

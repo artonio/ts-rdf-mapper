@@ -15,10 +15,10 @@ export class PersonMultipleDataTypes {
     @RdfSubject('person')
     public uuid: string;
 
-    @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({prop: 'person:russianName', lang: 'ru'})
     public name: string;
 
-    @RdfProperty({prop: 'person:germanName', lang: 'de'})
+    @RdfProperty({prop: 'person:englishName', lang: 'en'})
     public germanName: string;
 
     @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})

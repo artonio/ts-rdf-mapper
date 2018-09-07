@@ -48,7 +48,7 @@ export class SerializerProcessor {
             }
 
             const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
-            this.prefixes = {...prefixxes};
+            this.prefixes = {...this.prefixes, ...prefixxes};
             // this.n3Writer.addPrefixes(prefixxes); waiting for DefinitelyTyped merge
             if (beanType) {
                 const resourceIdentifierQuad: RDF.Quad = this.createQuad(subject, this.xsdType, N3.DataFactory.namedNode(beanType));
