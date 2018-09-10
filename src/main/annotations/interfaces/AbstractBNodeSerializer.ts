@@ -44,7 +44,7 @@ export type RDFBlankNode = RDF.BlankNode;
  *    }
  *
  *    serialize(value: Object): RDFTriple[] {
- *      const quads: RDFTriple[] = [];
+ *      const triples: RDFTriple[] = [];
  *
  *      Object.keys(value).forEach(key => {
  *            const predicate: RDFResourceIRI = this.makePredicate(`address:${key}`);
@@ -61,10 +61,10 @@ export type RDFBlankNode = RDF.BlankNode;
  *            if (typeof (value[key]) === 'number') {
  *                obj = this.makeLiteralWithDataType(value[key], 'xsd:integer');
  *            }
- *            quads.push(this.createTriple(this.subject, predicate, obj));
+ *            triples.push(this.createTriple(this.subject, predicate, obj));
  *       });
  *
- *     return quads;
+ *     return triples;
  *    }
  *  }
  *
@@ -145,7 +145,7 @@ export abstract class AbstractBNodeSerializer {
      * Provided the following was called in constructor *this.addPrefix('address', 'http://example.com/Address/');*
      *
      * ```ts
-     * const quads: RDFTriple[] = [];
+     * const triples: RDFTriple[] = [];
      *
      *     Object.keys(value).forEach(key => {
      *            const predicate: RDFResourceIRI = this.makePredicate(`address:${key}`);
@@ -162,10 +162,10 @@ export abstract class AbstractBNodeSerializer {
      *            if (typeof (value[key]) === 'number') {
      *                obj = this.makeLiteralWithDataType(value[key], 'xsd:integer');
      *            }
-     *            quads.push(this.createTriple(this.subject, predicate, obj));
+     *            triples.push(this.createTriple(this.subject, predicate, obj));
      *        });
      *
-     *     return quads;
+     *     return triples;
      * ```
      * @param value - json object passed i.e.
      *

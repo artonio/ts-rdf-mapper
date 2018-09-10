@@ -23,7 +23,7 @@ export class AddressSerializer extends AbstractBNodeSerializer {
     }
 
     serialize(value: Object): RDFTriple[] {
-        const quads: RDFTriple[] = [];
+        const triples: RDFTriple[] = [];
 
         Object.keys(value).forEach(key => {
             const predicate: RDFResourceIRI = this.makePredicate(`address:${key}`);
@@ -40,10 +40,10 @@ export class AddressSerializer extends AbstractBNodeSerializer {
             if (typeof (value[key]) === 'number') {
                 obj = this.makeLiteralWithDataType(value[key], 'xsd:integer');
             }
-            quads.push(this.createTriple(this.subject, predicate, obj));
+            triples.push(this.createTriple(this.subject, predicate, obj));
         });
 
-        return quads;
+        return triples;
     }
 
 }

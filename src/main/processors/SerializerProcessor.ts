@@ -22,6 +22,7 @@ export class SerializerProcessor {
     private readonly xsdType: RDF.NamedNode = N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
 
     constructor() {
+        this.prefixes = {xsd: N3.DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#')};
     }
 
     /**
@@ -48,16 +49,14 @@ export class SerializerProcessor {
             const rdfSubjectDecorator: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);
 
             // ?subject ?predicate ?object
-            let subject: RDF.Term;
-            if (rdfSubjectDecorator) {
-                subject = N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator.val}`);
-            } else {
-                subject = N3.DataFactory.blankNode();
-            }
+            const subject: RDF.Term = this.makeSubject(rdfSubjectDecorator);
 
-            const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
-            this.prefixes = {...this.prefixes, ...prefixxes};
+            if (ns) {
+                const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
+                this.prefixes = {...this.prefixes, ...prefixxes};
+            }
             // this.n3Writer.addPrefixes(prefixxes); waiting for DefinitelyTyped merge
+            // If @RdfBean is present, we create at triple in form of ?subject a ?object
             if (beanType) {
                 const resourceIdentifierQuad: RDF.Quad = this.createQuad(subject, this.xsdType, N3.DataFactory.namedNode(beanType));
                 this.quadsArr.push(resourceIdentifierQuad);
@@ -71,10 +70,8 @@ export class SerializerProcessor {
                     const serializer: IRDFSerializer = p.decoratorMetadata.serializer;
                     // ?subject ?predicate ?object
                     const rdfPredicateString: string = p.decoratorMetadata.predicate;
-                    let predicate: RDF.NamedNode;
-                    if (rdfPredicateString) {
-                        predicate = N3.DataFactory.namedNode(rdfPredicateString);
-                    }
+                    const predicate: RDF.NamedNode = this.makePredicate(rdfPredicateString);
+
                     const xsdDataTypeString: string = p.decoratorMetadata.xsdType;
                     let xsdDataType: RDF.NamedNode;
                     if (xsdDataTypeString) {
@@ -179,6 +176,30 @@ export class SerializerProcessor {
         return N3.DataFactory.literal(value, languageOrDatatype);
     }
 
+    private makeSubject(rdfSubjectDecorator?: IRdfSubjectMetadata): RDF.Term {
+        let subject: RDF.Term;
+        if (rdfSubjectDecorator) {
+            if (/^(http|https):\/\/?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(rdfSubjectDecorator.prop)) {
+                subject = N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}${rdfSubjectDecorator.val}`);
+            } else {
+                subject = N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator.val}`);
+            }
+        } else {
+            subject = N3.DataFactory.blankNode();
+        }
+        return subject;
+    }
+
+    private makePredicate(rdfPredicateString?: string): RDF.NamedNode {
+        let predicate: RDF.NamedNode;
+        if (rdfPredicateString) {
+            predicate = N3.DataFactory.namedNode(rdfPredicateString);
+            return predicate;
+        } else {
+            throw new Error('predicate is a mandatory property');
+        }
+    }
+
     private createQuad(subject: RDF.Term, predicate: RDF.Term, object: RDF.Term): RDF.Quad {
         return N3.DataFactory.quad(
             subject,
@@ -204,7 +225,7 @@ export class SerializerProcessor {
             r[key] = N3.DataFactory.namedNode(ns[key]);
         });
 
-        r['xsd'] = N3.DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#');
+        // r['xsd'] = N3.DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#');
         return r;
     }
 

@@ -169,7 +169,7 @@ describe('Testing basic serialization functions', () => {
         u.birthDate = new Date('1995-12-17T03:24:00');
 
         const r = RdfMapper.serialize(u);
-        console.log(r);
+        // console.log(r);
     });
 
     it('Should serialize into a blank node', () => {
@@ -180,7 +180,7 @@ describe('Testing basic serialization functions', () => {
         video.name = 'Japanese Cheesecake instructions';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
-        console.log(r);
+        // console.log(r);
     });
 
     it('Serialize json with dynamic serializer', () => {
@@ -188,7 +188,7 @@ describe('Testing basic serialization functions', () => {
         u.name = 'Anton';
         u.address = {streetName: 'St Clair', streetNumber: 223, isRegistered: true};
         const r = RdfMapper.serialize(u);
-        console.log(r);
+        // console.log(r);
     });
 
 });
