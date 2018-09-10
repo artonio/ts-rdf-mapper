@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import {IRdfProperty} from './interfaces/IRdfProperty';
 import {IRdfPropertyMetadata} from './interfaces/IRdfPropertyMetadata';
 
-const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any, mapper: (value: any) => T) => {
+const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any) => {
     const values = new Map<any, T>();
 
     const rdfPropertyMetaData: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty-non-instance', prototype) || [];
@@ -16,7 +16,7 @@ const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any, mapper
                     return values.get(this);
                 },
                 set(value: any) {
-                    values.set(this, mapper(value));
+                    values.set(this, value);
                     const s: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', this) || [];
                     if (value) {
                         s.push({key: key, val: value, decoratorMetadata: prop});
@@ -35,8 +35,6 @@ const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any, mapper
 
 export const RdfProperty = (prop: IRdfProperty) => {
     return (target: Object, key: string) => {
-        makeRDFPropertyMapper(target, key, prop, (value: any) => {
-            return value;
-        });
+        makeRDFPropertyMapper(target, key, prop);
     };
 };

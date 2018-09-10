@@ -1,5 +1,7 @@
 export interface IRdfProperty {
-    // can be used to identify type of object at runtime (needed for deserialization)
+    /**
+     * used to identify type of object at runtime (needed for deserialization)
+     */
     clazz?: any;
     /**
      * @prop - Predicate in the form of prefix:somename or a full URI
@@ -16,11 +18,14 @@ export interface IRdfProperty {
     lang?: string;
 
     /**
+     * Is RDF List
+     */
+    isRDFList?: boolean;
+
+    /**
      * Serializer must either extend AbstractBNodeSerializer class or implement the IRDFSerializer interface
      */
-
     serializer?: any;
 
     deserializer?: any;
-
 }

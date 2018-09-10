@@ -16,7 +16,7 @@ describe('Testing basic serialization functions', () => {
         const p = new PersonMultipleDataTypes();
         p.uuid = '123345dfx';
         p.name = 'Anton';
-        p.germanName = 'Antony';
+        p.englishName = 'Antony';
         p.gender = 'M';
         p.age = 32;
         p.isAdult = true;
@@ -26,8 +26,7 @@ describe('Testing basic serialization functions', () => {
 
         const b = RdfMapper.serialize(p);
         expect(b).toContain(`person:123345dfx a foaf:Person;`);
-        expect(b).toContain(`person:russianName "Anton"@ru;`);
-        expect(b).toContain(`person:englishName "Antony"@en;`);
+        expect(b).toContain(`person:name "Anton"^^xsd:string, "Antony"@en;`);
         expect(b).toContain(`person:gender "M"^^xsd:string;`);
         expect(b).toContain(`person:age "32"^^xsd:int;`);
         expect(b).toContain(`person:isAdult "true"^^xsd:boolean;`);

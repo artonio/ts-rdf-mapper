@@ -1,6 +1,6 @@
 import {IRdfSubjectMetadata} from './interfaces/IRdfSubjectMetadata';
 
-const makeRDFSubjectMapper = <T>(prototype: any, key: string, prop: any, mapper: (value: any) => T) => {
+const makeRDFSubjectMapper = <T>(prototype: any, key: string, prop: any) => {
     const values = new Map<any, T>();
     const metadataValForDesirealization: IRdfSubjectMetadata = {key: key, val: null, prop: prop};
     Reflect.defineMetadata('RdfSubject-non-instance', metadataValForDesirealization, prototype);
@@ -13,7 +13,7 @@ const makeRDFSubjectMapper = <T>(prototype: any, key: string, prop: any, mapper:
                 set(value: any) {
                     const metadataValForSirealization: IRdfSubjectMetadata = {key: key, val: value, prop: prop};
                     Reflect.defineMetadata('RdfSubject', metadataValForSirealization, this);
-                    values.set(this, mapper(value));
+                    values.set(this, value);
                 },
                 enumerable: true,
             });
@@ -26,8 +26,6 @@ const makeRDFSubjectMapper = <T>(prototype: any, key: string, prop: any, mapper:
 
 export const RdfSubject = (prop: string) => {
     return (target: Object, key: string) => {
-        makeRDFSubjectMapper(target, key, prop, (value: any) => {
-            return value;
-        });
+        makeRDFSubjectMapper(target, key, prop);
     };
 };
