@@ -30,40 +30,66 @@ export class DeserializerProcessor {
         return Promise.resolve(dtoInstance);
     }
 
-    private process<T>(type: { new(): T }, store: N3.N3Store): T {
+    private process<T>(type: { new(): T }, store: N3.N3Store, object?: RDF.Term): T {
         const dtoInstance = new type();
 
         const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', type.prototype);
         const beanType: string = Reflect.getMetadata('RdfBean', type.prototype);
         const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty-non-instance', type.prototype);
         const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject-non-instance', type.prototype);
-        const beanTypeUri: string = Utils.getUriFromPrefixedName(beanType, ns); // - this can be undefined
 
-        const numResources: N3.Quad[] = store.getQuads(null, N3.DataFactory.namedNode(this.xsdType), N3.DataFactory.namedNode(beanTypeUri), null);
-        if (numResources.length > 0) {
-            const triple: N3.Quad = numResources[0];
+        const numTriples: N3.Quad[] = this.getNumTriplesByBeanType(beanType, store, ns);
+        if (numTriples.length > 0) {
+            const triple: N3.Quad = numTriples[0];
             // Get URI and set the value for key which contains @RdfSubject annotation
-            dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(triple.subject.value, subject.prop, ns);
-
+            if (subject) {
+                dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(triple.subject.value, subject.prop, ns);
+            }
             properties.forEach((rdfProp: IRdfPropertyMetadata) => {
-                const objects: RDF.Term[] = store.getObjects(triple.subject, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
+                let objects: RDF.Term[];
+                if (object) {
+                    objects = store.getObjects(object, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
+                } else {
+                    objects = store.getObjects(triple.subject, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
+                }
                 if (objects.length > 0) {
                     const ob: RDF.Term = objects[0];
                     if (N3.Util.isLiteral(ob)) {
-                        // const literal: RDF.Literal = <RDF.Literal>ob;
                         dtoInstance[rdfProp.key] = ob.value;
                     }
 
-                    if (N3.Util.isNamedNode(ob)) {
-                        const res = this.process(rdfProp.decoratorMetadata.clazz, store);
-                        dtoInstance[rdfProp.key] = res;
+                    if (N3.Util.isNamedNode(ob) || N3.Util.isBlankNode(ob)) {
+                        if (rdfProp.decoratorMetadata.isArray) {
+                            const holder = [];
+                            objects.forEach(o => {
+                                const res = this.process(rdfProp.decoratorMetadata.clazz, store, o);
+                                holder.push(res);
+                            });
+                            dtoInstance[rdfProp.key] = holder;
+                        } else {
+                            const res = this.process(rdfProp.decoratorMetadata.clazz, store, ob);
+                            dtoInstance[rdfProp.key] = res;
+                        }
                     }
                 }
             });
+
         }
 
         return dtoInstance;
 
+    }
+
+    private getNumTriplesByBeanType(beanType: string, store: N3.N3Store, ns: IRdfNamespaces): N3.Quad[] {
+        let numTriples: N3.Quad[];
+        if (beanType) {
+            const beanTypeUri = Utils.getUriFromPrefixedName(beanType, ns); // - this can be undefined
+            numTriples = store.getQuads(null, N3.DataFactory.namedNode(this.xsdType), N3.DataFactory.namedNode(beanTypeUri), null);
+        } else {
+            numTriples = store.getQuads(null, null, null, null);
+        }
+
+        return numTriples;
     }
 
     private async getQuadsAndPrefixes(ttlData: string): Promise<QuadsAndPrefixes> {

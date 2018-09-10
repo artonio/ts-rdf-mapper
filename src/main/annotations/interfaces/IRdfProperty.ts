@@ -23,6 +23,12 @@ export interface IRdfProperty {
     isRDFList?: boolean;
 
     /**
+     * Specify if this is an array of objects, needed for deserialization
+     */
+
+    isArray?: boolean;
+
+    /**
      * Serializer must either extend [[AbstractBNodeSerializer]] class or implement the [[IRDFSerializer]] interface
      */
     serializer?: any;

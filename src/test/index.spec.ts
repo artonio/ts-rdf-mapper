@@ -33,7 +33,7 @@ describe('Testing basic serialization functions', () => {
         expect(b).toContain(`person:weight "95.5"^^xsd:double;`);
         expect(b).toContain(`person:height "198.5"^^xsd:long;`);
         expect(b).toContain(`person:buoyancy "53.2"^^xsd:float.`);
-        console.log(b);
+        // console.log(b);
 
     });
 
@@ -180,7 +180,7 @@ describe('Testing basic serialization functions', () => {
         video.name = 'Japanese Cheesecake instructions';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
-        // console.log(r);
+        console.log(r);
     });
 
     it('Serialize json with dynamic serializer', () => {

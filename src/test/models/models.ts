@@ -166,3 +166,12 @@ person:123345dfx a foaf:Person;
     person:height "198.5"^^xsd:long;
     person:buoyancy "53.2"^^xsd:float.
 `;
+
+export const recipeVideoTTL = `
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix schema: <http://schema.org/>.
+
+_:n3-1 schema:name "Japanese Cheesecake instructions"^^xsd:string.
+_:n3-0 a schema:Recipe;
+    schema:recipeName "Cheesecake"^^xsd:string;
+    schema:video _:n3-1.`;
