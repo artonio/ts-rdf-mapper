@@ -9,8 +9,25 @@ export type RDFBlankNode = RDF.BlankNode;
 export abstract class AbstractBNodeSerializer {
 
     protected prefixes: N3.Prefixes = {xsd: this.makeResourceIRI('http://www.w3.org/2001/XMLSchema#')};
-    protected subject: RDFBlankNode = this.makeBlankNode();
+    /**
+     * Blank node is created when a developer extends this class. Identifies the *subject* in triple
+     *
+     * ```
+     * subject predicate object
+     * ```
+     */
+    protected subject: RDFBlankNode;
+    /**
+     * @hidden
+     */
     protected readonly isBnodeSerializer = true;
+
+    /**
+     * @hidden
+     */
+    protected constructor() {
+        this.subject = this.makeBlankNode();
+    }
 
     abstract serialize(value: Object): RDFQuad[];
 

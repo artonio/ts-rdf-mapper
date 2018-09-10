@@ -8,7 +8,7 @@ export interface IRdfSubjectMetadata {
      */
     val: string;
     /**
-     * @prop - prefix or a full URI that will be prepended before the value
+     * @predicate - prefix or a full URI that will be prepended before the value
      */
     prop: string;
 }

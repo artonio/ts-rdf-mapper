@@ -8,19 +8,27 @@ import {IRDFSerializer} from '../annotations/interfaces/IRDFSerializer';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
 import {Utils} from '../Utils';
 
+/**
+ * @ignore
+ */
 export class SerializerProcessor {
 
     // N3 writer
-    n3Writer: N3Writer;
-    quadsArr: RDF.Quad[] = [];
-    prefixes: N3.Prefixes = {};
-    serializers: any = {};
+    private n3Writer: N3Writer;
+    private quadsArr: RDF.Quad[] = [];
+    private prefixes: N3.Prefixes = {};
+    private serializers: any = {};
 
     private readonly xsdType: RDF.NamedNode = N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
 
     constructor() {
     }
 
+    /**
+     * Serialize object or array of objects to turtle
+     * @param target - Object or Array of Objects to be serialized to turtle
+     * @returns - Turtle representation of the object(s)
+     */
     public serialize<T>(target: T | T[]): string {
         this.process(target);
         this.sortQuads(this.quadsArr);
@@ -62,7 +70,7 @@ export class SerializerProcessor {
                     const propertyClassType = p.decoratorMetadata.clazz;
                     const serializer: IRDFSerializer = p.decoratorMetadata.serializer;
                     // ?subject ?predicate ?object
-                    const rdfPredicateString: string = p.decoratorMetadata.prop;
+                    const rdfPredicateString: string = p.decoratorMetadata.predicate;
                     let predicate: RDF.NamedNode;
                     if (rdfPredicateString) {
                         predicate = N3.DataFactory.namedNode(rdfPredicateString);

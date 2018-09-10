@@ -15,28 +15,28 @@ export class PersonMultipleDataTypes {
     @RdfSubject('person')
     public uuid: string;
 
-    @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'person:name', xsdType: XSDDataType.XSD_STRING})
     public name: string;
 
-    @RdfProperty({prop: 'person:name', lang: 'en'})
+    @RdfProperty({predicate: 'person:name', lang: 'en'})
     public englishName: string;
 
-    @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'person:gender', xsdType: XSDDataType.XSD_STRING})
     public gender: string;
 
-    @RdfProperty({prop: 'person:age', xsdType: XSDDataType.XSD_INT})
+    @RdfProperty({predicate: 'person:age', xsdType: XSDDataType.XSD_INT})
     public age: number;
 
-    @RdfProperty({prop: 'person:isAdult', xsdType: XSDDataType.XSD_BOOLEAN})
+    @RdfProperty({predicate: 'person:isAdult', xsdType: XSDDataType.XSD_BOOLEAN})
     public isAdult: boolean;
 
-    @RdfProperty({prop: 'person:weight', xsdType: XSDDataType.XSD_DOUBLE})
+    @RdfProperty({predicate: 'person:weight', xsdType: XSDDataType.XSD_DOUBLE})
     public weight: number;
 
-    @RdfProperty({prop: 'person:height', xsdType: XSDDataType.XSD_LONG})
+    @RdfProperty({predicate: 'person:height', xsdType: XSDDataType.XSD_LONG})
     public height: number;
 
-    @RdfProperty({prop: 'person:buoyancy', xsdType: XSDDataType.XSD_FLOAT})
+    @RdfProperty({predicate: 'person:buoyancy', xsdType: XSDDataType.XSD_FLOAT})
     public buoyancy: number;
 
 }
@@ -51,10 +51,10 @@ export class Addr {
     @RdfSubject('address')
     public uuid: string;
 
-    @RdfProperty({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
     public streetName: string;
 
-    @RdfProperty({prop: 'address:houseNum', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'address:houseNum', xsdType: XSDDataType.XSD_STRING})
     public houseNum: number;
 }
 
@@ -67,12 +67,12 @@ export class Per {
     @RdfSubject('person')
     public uuid: string;
 
-    @RdfProperty({prop: 'person:hasAddress', clazz: Addr})
+    @RdfProperty({predicate: 'person:hasAddress', clazz: Addr})
     public addresses: Addr[];
 }
 
 export abstract class Base {
-    @RdfProperty({prop: 'foaf:baseProp', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'foaf:baseProp', xsdType: XSDDataType.XSD_STRING})
     baseProp: string;
 }
 
@@ -85,7 +85,7 @@ export class SuperBase extends Base {
     @RdfSubject('foaf')
     public uuid: string;
 
-    @RdfProperty({prop: 'foaf:extendedProp', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'foaf:extendedProp', xsdType: XSDDataType.XSD_STRING})
     extendedProp: string;
 }
 
@@ -98,19 +98,19 @@ export class Person {
     @RdfSubject('person')
     public uuid: string;
 
-    @RdfProperty({prop: 'foaf:firstName', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'foaf:firstName', xsdType: XSDDataType.XSD_STRING})
     firstName: string;
 
-    @RdfProperty({prop: 'foaf:name', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'foaf:name', xsdType: XSDDataType.XSD_STRING})
     name: string;
 
-    @RdfProperty({prop: 'foaf:nick', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'foaf:nick', xsdType: XSDDataType.XSD_STRING})
     nick: string;
 
-    @RdfProperty({prop: 'foaf:surname', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'foaf:surname', xsdType: XSDDataType.XSD_STRING})
     surname: string;
 
-    @RdfProperty({prop: 'foaf:title', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'foaf:title', xsdType: XSDDataType.XSD_STRING})
     title: string;
 
 }
@@ -134,7 +134,7 @@ export class Calendar {
     @RdfSubject('calendar')
     public uuid: string;
 
-    @RdfProperty({prop: 'foaf:day', xsdType: XSDDataType.XSD_STRING, clazz: Days, serializer: DaysSerializer})
+    @RdfProperty({predicate: 'foaf:day', xsdType: XSDDataType.XSD_STRING, clazz: Days, serializer: DaysSerializer})
     public day: Days;
 
 }

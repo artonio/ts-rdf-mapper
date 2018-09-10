@@ -26,9 +26,9 @@ export class User {
     @RdfSubject('user')
     public uuid: string;
 
-    @RdfProperty({prop: 'user:registrationDate', xsdType: XSDDataType.XSD_DATE_TIME, serializer: RegistrationDateSerializer})
+    @RdfProperty({predicate: 'user:registrationDate', xsdType: XSDDataType.XSD_DATE_TIME, serializer: RegistrationDateSerializer})
     public regDate: number;
 
-    @RdfProperty({prop: 'user:birthday', xsdType: XSDDataType.XSD_DATE_TIME, serializer: BirthDateSerializer, clazz: Date})
+    @RdfProperty({predicate: 'user:birthday', xsdType: XSDDataType.XSD_DATE_TIME, serializer: BirthDateSerializer, clazz: Date})
     public birthDate: Date;
 }

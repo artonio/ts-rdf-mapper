@@ -58,6 +58,6 @@ export class UserJsonObject {
     @RdfSubject('user')
     public name: string;
 
-    @RdfProperty({prop: 'user:address', serializer: AddressSerializer})
+    @RdfProperty({predicate: 'user:address', serializer: AddressSerializer})
     public address: UAddress;
 }

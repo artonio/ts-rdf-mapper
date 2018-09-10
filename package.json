@@ -13,7 +13,8 @@
     "tslint": "tslint --project ./tsconfig.json --type-check --fix",
     "lint": "npm run tslint",
     "build-test": "node_modules/.bin/tsc -p . && node_modules/.bin/jasmine-node bin --verbose --junitreport --noColor",
-    "testDebug": "node ./node_modules/jasmine/bin/jasmine.js bin/src/test/index.spec.js"
+    "testDebug": "node ./node_modules/jasmine/bin/jasmine.js bin/src/test/index.spec.js",
+    "generate-docs": "typedoc --options typedoc.js src/main"
   },
   "keywords": [
     "RDF",

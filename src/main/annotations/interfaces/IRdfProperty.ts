@@ -4,9 +4,9 @@ export interface IRdfProperty {
      */
     clazz?: any;
     /**
-     * @prop - Predicate in the form of prefix:somename or a full URI
+     * @predicate - Predicate in the form of prefix:somename or a full URI
      */
-    prop: string;
+    predicate: string;
     /**
      * XSDDataType class must be used, maybe switch to enum in the future
      */
@@ -23,7 +23,7 @@ export interface IRdfProperty {
     isRDFList?: boolean;
 
     /**
-     * Serializer must either extend AbstractBNodeSerializer class or implement the IRDFSerializer interface
+     * Serializer must either extend [[AbstractBNodeSerializer]] class or implement the [[IRDFSerializer]] interface
      */
     serializer?: any;
 

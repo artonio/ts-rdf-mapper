@@ -48,7 +48,7 @@ describe('Testing basic serialization functions', () => {
             @RdfSubject('address')
             public uuid: string;
 
-            @RdfProperty({prop: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
+            @RdfProperty({predicate: 'address:streetName', xsdType: XSDDataType.XSD_STRING})
             public streetName: string;
 
         }
@@ -62,10 +62,10 @@ describe('Testing basic serialization functions', () => {
             @RdfSubject('person')
             public uuid: string;
 
-            @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
+            @RdfProperty({predicate: 'person:name', xsdType: XSDDataType.XSD_STRING})
             public name: string;
 
-            @RdfProperty({prop: 'person:hasAddress', clazz: Address})
+            @RdfProperty({predicate: 'person:hasAddress', clazz: Address})
             public address: Address1;
         }
 

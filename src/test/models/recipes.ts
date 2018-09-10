@@ -7,7 +7,7 @@ import {XSDDataType} from '../../main/annotations/XSDDataType';
     schema: 'http://schema.org/'
 })
 export class Video {
-    @RdfProperty({prop: 'schema:name', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'schema:name', xsdType: XSDDataType.XSD_STRING})
     public name: string;
 }
 
@@ -16,8 +16,8 @@ export class Video {
 })
 @RdfBean('schema:Recipe')
 export class Recipe {
-    @RdfProperty({prop: 'schema:recipeName', xsdType: XSDDataType.XSD_STRING})
+    @RdfProperty({predicate: 'schema:recipeName', xsdType: XSDDataType.XSD_STRING})
     public recipeName: string;
-    @RdfProperty({prop: 'schema:video', clazz: Video})
+    @RdfProperty({predicate: 'schema:video', clazz: Video})
     public video: Video;
 }

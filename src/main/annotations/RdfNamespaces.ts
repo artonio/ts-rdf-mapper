@@ -1,6 +1,20 @@
 import 'reflect-metadata';
 import {IRdfNamespaces} from './interfaces/IRdfNamespaces';
-
+/**
+ * Responsible of defining prefixes and it's corresponding URIs
+ *
+ * Basic usage example:
+ *
+ * ```ts
+ * @RdfNamespaces({
+ *   foaf: 'http://xmlns.com/foaf/0.1/',
+ *   person: 'http://example.com/Person/'
+ * })
+ * export class Person {
+ *
+ * }
+ * ```
+ */
 export const RdfNamespaces = (prefixes?: IRdfNamespaces) => {
     return (target: any) => {
 
@@ -10,10 +24,7 @@ export const RdfNamespaces = (prefixes?: IRdfNamespaces) => {
         // a utility function to generate instances of a class
         function construct(constructor, args) {
             const c: any = function () {
-                const keys = Object.keys(constructor.prototype);
                 return constructor.apply(this, args);
-                // const re = constructor.apply(this.constructor, args);
-                // return constructor.apply(this.constructor, args);
             };
             c.prototype = constructor.prototype;
 
@@ -22,19 +33,12 @@ export const RdfNamespaces = (prefixes?: IRdfNamespaces) => {
 
         // the new constructor behaviour
         const f: any = function (...args) {
-            // console.log(`New: ${original.name}`);
-
-            // console.log('Namespaces');
-            // console.log(prefixValuePairs);
-
             return construct(original, args);
         };
 
         // copy prototype so intanceof operator still works
         f.prototype = original.prototype;
         Reflect.defineMetadata('RdfNamespaces', prefixes, f.prototype);
-
-        // return new constructor (will override original)
         return f;
     };
 };

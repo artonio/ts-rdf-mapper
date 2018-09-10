@@ -3,10 +3,20 @@ import 'reflect-metadata';
 import {IRdfNamespaces} from './annotations/interfaces/IRdfNamespaces';
 
 export class Utils {
+    /**
+     * @hidden
+     * @param instance
+     * @param key
+     */
     public static getType(instance: any, key: string): any {
         return Reflect.getMetadata('design:type', instance, key);
     }
 
+    /**
+     * @hidden
+     * @param instance
+     * @param key
+     */
     public static isArrayType(instance: any, key: string): boolean {
         return Array === Utils.getType(instance, key);
     }
@@ -23,6 +33,11 @@ export class Utils {
         return holder;
     }
 
+    /**
+     * @hidden
+     * @param beanTypeUri
+     * @param model
+     */
     public static doesModelContainBeanType(beanTypeUri: string, model: N3.Quad[]): boolean {
         let holder = false;
 
@@ -37,10 +52,19 @@ export class Utils {
         return holder;
     }
 
+    /**
+     * @hidden
+     * @param instance
+     */
     public static getTypeNameFromInstance(instance): string {
         return instance.toString().trim().split(/[\s\()]/g)[1];
     }
 
+    /**
+     * @hidden
+     * @param type
+     * @param cache
+     */
     public static getCachedType(type: any, cache: Object): any {
         // tslint:disable-next-line:triple-equals
         const typeName: string = type.getJsonObjectMapperCacheKey != undefined ? type.getJsonObjectMapperCacheKey() : Utils.getTypeNameFromInstance(type);
@@ -50,6 +74,12 @@ export class Utils {
         return cache[typeName];
     }
 
+    /**
+     * @hidden
+     * @param subject
+     * @param prefix
+     * @param prefixesMap
+     */
     public static getUUIDFromResourceSubject(subject: string, prefix: string, prefixesMap: IRdfNamespaces): any {
         let result = subject;
         const prefixUri: string = prefixesMap[prefix];

@@ -46,7 +46,7 @@ export class DeserializerProcessor {
             dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(triple.subject.value, subject.prop, ns);
 
             properties.forEach((rdfProp: IRdfPropertyMetadata) => {
-                const objects: RDF.Term[] = store.getObjects(triple.subject, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.prop, ns)), null);
+                const objects: RDF.Term[] = store.getObjects(triple.subject, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
                 if (objects.length > 0) {
                     const ob: RDF.Term = objects[0];
                     if (N3.Util.isLiteral(ob)) {
