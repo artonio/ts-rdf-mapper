@@ -1,3 +1,6 @@
+/**
+ * Used by [[IRdfProperty.xsdType]]
+ */
 export class XSDDataType {
     public static XSD_STRING = 'xsd:string';
     public static XSD_NORMALIZED_STRING = 'xsd:normalizedString';

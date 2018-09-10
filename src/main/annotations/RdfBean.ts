@@ -1,5 +1,5 @@
 /**
- * Defines the type (xsd:type) of Resource
+ * **Optional** - Defines the type (xsd:type) of Resource,
  *
  * Basic usage and result example:
  *

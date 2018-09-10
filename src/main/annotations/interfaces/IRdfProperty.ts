@@ -8,7 +8,7 @@ export interface IRdfProperty {
      */
     predicate: string;
     /**
-     * XSDDataType class must be used, maybe switch to enum in the future
+     * [[XSDDataType]] can be used or a string
      */
     xsdType?: string;
 
