@@ -4,7 +4,7 @@
  * Basic usage and result example:
  *
  * ```ts
- * @RdfNamespaces({
+ * @RdfPrefixes({
  *   foaf: 'http://xmlns.com/foaf/0.1/',
  *   person: 'http://example.com/Person/'
  * })

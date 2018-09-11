@@ -1,6 +1,6 @@
 import * as N3 from 'n3';
 import 'reflect-metadata';
-import {IRdfNamespaces} from './annotations/interfaces/IRdfNamespaces';
+import {IRdfPrefixes} from './annotations/interfaces/IRdfPrefixes';
 
 export class Utils {
     /**
@@ -21,7 +21,7 @@ export class Utils {
         return Array === Utils.getType(instance, key);
     }
 
-    public static getUriFromPrefixedName(prefixedUri: string, prefixesMap: IRdfNamespaces): string {
+    public static getUriFromPrefixedName(prefixedUri: string, prefixesMap: IRdfPrefixes): string {
         let holder;
         const qualifiedNameArr: string[] = prefixedUri.split(':');
         if (qualifiedNameArr.length > 0) {
@@ -80,7 +80,7 @@ export class Utils {
      * @param prefix
      * @param prefixesMap
      */
-    public static getUUIDFromResourceSubject(subject: string, prefix: string, prefixesMap: IRdfNamespaces): any {
+    public static getUUIDFromResourceSubject(subject: string, prefix: string, prefixesMap: IRdfPrefixes): any {
         let result = subject;
         const prefixUri: string = prefixesMap[prefix];
         if (prefixUri) {

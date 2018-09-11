@@ -68,7 +68,7 @@ export type RDFBlankNode = RDF.BlankNode;
  *    }
  *  }
  *
- *  @RdfNamespaces({
+ *  @RdfPrefixes({
  *    foaf: 'http://xmlns.com/foaf/0.1/',
  *    user: 'http://example.com/User/'
  *  })

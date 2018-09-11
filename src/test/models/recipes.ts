@@ -1,9 +1,9 @@
 import {RdfBean} from '../../main/annotations/RdfBean';
-import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
+import {RdfPrefixes} from '../../main/annotations/RdfPrefixes';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
 
-@RdfNamespaces({
+@RdfPrefixes({
     schema: 'http://schema.org/'
 })
 export class Video {
@@ -11,7 +11,7 @@ export class Video {
     public name: string;
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     schema: 'http://schema.org/'
 })
 @RdfBean('schema:Recipe')

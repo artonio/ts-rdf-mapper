@@ -1,11 +1,11 @@
 import {
     AbstractBNodeSerializer,
     RDFLiteral,
-    RDFTriple,
-    RDFResourceIRI
+    RDFResourceIRI,
+    RDFTriple
 } from '../../main/annotations/interfaces/AbstractBNodeSerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
-import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
+import {RdfPrefixes} from '../../main/annotations/RdfPrefixes';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {RdfSubject} from '../../main/annotations/RdfSubject';
 
@@ -48,7 +48,7 @@ export class AddressSerializer extends AbstractBNodeSerializer {
 
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     user: 'http://example.com/User/'
 })

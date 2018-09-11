@@ -1,12 +1,12 @@
 import 'reflect-metadata';
-import {IRdfNamespaces} from './interfaces/IRdfNamespaces';
+import {IRdfPrefixes} from './interfaces/IRdfPrefixes';
 /**
  * Responsible of defining prefixes and it's corresponding URIs
  *
  * Basic usage example:
  *
  * ```ts
- * @RdfNamespaces({
+ * @RdfPrefixes({
  *   foaf: 'http://xmlns.com/foaf/0.1/',
  *   person: 'http://example.com/Person/'
  * })
@@ -15,7 +15,7 @@ import {IRdfNamespaces} from './interfaces/IRdfNamespaces';
  * }
  * ```
  */
-export const RdfNamespaces = (prefixes?: IRdfNamespaces) => {
+export const RdfPrefixes = (prefixes?: IRdfPrefixes) => {
     return (target: any) => {
 
         // save a reference to the original constructor
@@ -38,7 +38,7 @@ export const RdfNamespaces = (prefixes?: IRdfNamespaces) => {
 
         // copy prototype so intanceof operator still works
         f.prototype = original.prototype;
-        Reflect.defineMetadata('RdfNamespaces', prefixes, f.prototype);
+        Reflect.defineMetadata('RdfPrefixes', prefixes, f.prototype);
         return f;
     };
 };

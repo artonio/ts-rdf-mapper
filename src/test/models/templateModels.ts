@@ -1,9 +1,9 @@
 import {RdfBean} from '../../main/annotations/RdfBean';
-import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
+import {RdfPrefixes} from '../../main/annotations/RdfPrefixes';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
 
-@RdfNamespaces({
+@RdfPrefixes({
     dswaComment: 'http://www.uhn.ca/dwsa/comment/',
     dswaCommentProperty: 'http://www.uhn.ca/dwsa/comment/property/',
     dswaProp: 'http://www.uhn.ca/dswa/property/',
@@ -111,7 +111,7 @@ export class QaTemplateElement {
     }
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     dswaComment: 'http://www.uhn.ca/dwsa/comment/',
     dswaCommentProperty: 'http://www.uhn.ca/dwsa/comment/property/',
     dswaProp: 'http://www.uhn.ca/dswa/property/',

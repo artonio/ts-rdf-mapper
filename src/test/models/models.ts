@@ -1,11 +1,11 @@
 import {IRDFSerializer} from '../../main/annotations/interfaces/IRDFSerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
-import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
+import {RdfPrefixes} from '../../main/annotations/RdfPrefixes';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {RdfSubject} from '../../main/annotations/RdfSubject';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     person: 'http://example.com/Person/'
 })
@@ -41,7 +41,7 @@ export class PersonMultipleDataTypes {
 
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     person: 'http://example.com/Person/',
     address: 'http://xmlns.com/foaf/0.1/address/'
@@ -58,7 +58,7 @@ export class Addr {
     public houseNum: number;
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     person: 'http://example.com/Person/'
 })
@@ -76,7 +76,7 @@ export abstract class Base {
     baseProp: string;
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     person: 'http://example.com/Person/'
 })
@@ -89,7 +89,7 @@ export class SuperBase extends Base {
     extendedProp: string;
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     person: 'http://example.com/Person/'
 })
@@ -125,7 +125,7 @@ export enum Days {
     Sun, Mon, Tues, Wed, Thurs, Fri, Sat
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     calendar: 'http://example.com/Calendar/'
 })

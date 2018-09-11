@@ -1,10 +1,10 @@
 import {RdfBean} from '../../main/annotations/RdfBean';
-import {RdfNamespaces} from '../../main/annotations/RdfNamespaces';
+import {RdfPrefixes} from '../../main/annotations/RdfPrefixes';
 import {RdfProperty} from '../../main/annotations/RdfProperty';
 import {RdfSubject} from '../../main/annotations/RdfSubject';
 import {XSDDataType} from '../../main/annotations/XSDDataType';
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     address: 'http://xmlns.com/foaf/0.1/address/'
 })
@@ -17,7 +17,7 @@ export class Address {
     public streetName: string;
 }
 
-@RdfNamespaces({
+@RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     person: 'http://example.com/Person/'
 })

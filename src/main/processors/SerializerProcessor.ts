@@ -2,7 +2,7 @@ import * as N3 from 'n3';
 import {N3Writer} from 'n3';
 import * as RDF from 'rdf-js';
 import 'reflect-metadata';
-import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
+import {IRdfPrefixes} from '../annotations/interfaces/IRdfPrefixes';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRDFSerializer} from '../annotations/interfaces/IRDFSerializer';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
@@ -45,7 +45,7 @@ export class SerializerProcessor {
                 this.process(tar);
             });
         } else {
-            const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', target);
+            const ns: IRdfPrefixes = Reflect.getMetadata('RdfPrefixes', target);
             const beanType: string = Reflect.getMetadata('RdfBean', target);
             const rdfSubjectDecorator: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject', target);
 
@@ -234,7 +234,7 @@ export class SerializerProcessor {
         return result;
     }
 
-    private getN3NsPrefixObject(ns: IRdfNamespaces): N3.Prefixes {
+    private getN3NsPrefixObject(ns: IRdfPrefixes): N3.Prefixes {
         const r: N3.Prefixes = {};
 
         const keys: string[] = Object.keys(ns);

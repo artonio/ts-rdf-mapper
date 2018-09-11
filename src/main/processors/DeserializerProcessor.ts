@@ -1,6 +1,6 @@
 import * as N3 from 'n3';
 import * as RDF from 'rdf-js';
-import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
+import {IRdfPrefixes} from '../annotations/interfaces/IRdfPrefixes';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
 import {Utils} from '../Utils';
@@ -33,7 +33,7 @@ export class DeserializerProcessor {
     private process<T>(type: { new(): T }, store: N3.N3Store, object?: RDF.Term): T {
         const dtoInstance = new type();
 
-        const ns: IRdfNamespaces = Reflect.getMetadata('RdfNamespaces', type.prototype);
+        const ns: IRdfPrefixes = Reflect.getMetadata('RdfPrefixes', type.prototype);
         const beanType: string = Reflect.getMetadata('RdfBean', type.prototype);
         const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty-non-instance', type.prototype);
         const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject-non-instance', type.prototype);
@@ -87,7 +87,7 @@ export class DeserializerProcessor {
 
     }
 
-    private getNumTriplesByBeanType(beanType: string, store: N3.N3Store, ns: IRdfNamespaces): N3.Quad[] {
+    private getNumTriplesByBeanType(beanType: string, store: N3.N3Store, ns: IRdfPrefixes): N3.Quad[] {
         let numTriples: N3.Quad[];
         if (beanType) {
             const beanTypeUri = Utils.getUriFromPrefixedName(beanType, ns);
