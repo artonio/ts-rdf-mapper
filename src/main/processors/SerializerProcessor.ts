@@ -6,6 +6,7 @@ import {IRdfNamespaces} from '../annotations/interfaces/IRdfNamespaces';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRDFSerializer} from '../annotations/interfaces/IRDFSerializer';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
+import {ISODateSerializer} from '../RDFSerializers/ISODateSerializer';
 import {Utils} from '../Utils';
 
 /**
@@ -114,37 +115,22 @@ export class SerializerProcessor {
     private processArrayOfPrimitiveValues(value: any[], subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {}
 
     private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, lang: string, serializer?: any): void {
-        if (serializer)
-        {
-            const s: any = this.getOrCreateSerializer(serializer);
-            if (s.isBnodeSerializer) {
-                this.prefixes = {...this.prefixes, ...s.prefixes};
-                const q = this.createQuad(subject, predicate, s.subject);
-                this.quadsArr.push(...s.serialize(value));
-                this.quadsArr.push(q);
+        if (serializer) {
+            this.processPrimiteValueWithAnnotatedSerializer(value, subject, predicate, xsdDataType, lang, serializer);
+        } else {
+            if (value instanceof Date) {
+                this.processValueOfDateTypeWithDefaultSerializer(value, subject, predicate, xsdDataType);
             } else {
                 let objectLiteral: RDF.Literal;
                 if (lang) {
-                    objectLiteral = this.makeLiteral(s.serialize(value), lang);
+                    objectLiteral = this.makeLiteral(value, lang);
                 }
                 if (xsdDataType) {
-                    objectLiteral = this.makeLiteral(s.serialize(value), xsdDataType);
+                    objectLiteral = this.makeLiteral(value, xsdDataType);
                 }
                 const q = this.createQuad(subject, predicate, objectLiteral);
                 this.quadsArr.push(q);
-
             }
-
-        } else {
-            let objectLiteral: RDF.Literal;
-            if (lang) {
-                objectLiteral = this.makeLiteral(value, lang);
-            }
-            if (xsdDataType) {
-                objectLiteral = this.makeLiteral(value, xsdDataType);
-            }
-            const q = this.createQuad(subject, predicate, objectLiteral);
-            this.quadsArr.push(q);
         }
     }
 
@@ -158,10 +144,41 @@ export class SerializerProcessor {
         }
         else
         {
-            const resultObject: RDF.Term = this.process(value); // returns NamedNode
-            const q = this.createQuad(subject, predicate, resultObject);
+            if (value instanceof Date) {
+                this.processValueOfDateTypeWithDefaultSerializer(value, subject, predicate, xsdDataType);
+            } else {
+                const resultObject: RDF.Term = this.process(value); // returns NamedNode
+                const q = this.createQuad(subject, predicate, resultObject);
+                this.quadsArr.push(q);
+            }
+        }
+    }
+
+    private processPrimiteValueWithAnnotatedSerializer(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, lang: string, serializer: any) {
+        const s: any = this.getOrCreateSerializer(serializer);
+        if (s.isBnodeSerializer) {
+            this.prefixes = {...this.prefixes, ...s.prefixes};
+            const q = this.createQuad(subject, predicate, s.subject);
+            this.quadsArr.push(...s.serialize(value));
+            this.quadsArr.push(q);
+        } else {
+            let objectLiteral: RDF.Literal;
+            if (lang) {
+                objectLiteral = this.makeLiteral(s.serialize(value), lang);
+            }
+            if (xsdDataType) {
+                objectLiteral = this.makeLiteral(s.serialize(value), xsdDataType);
+            }
+            const q = this.createQuad(subject, predicate, objectLiteral);
             this.quadsArr.push(q);
         }
+    }
+
+    private processValueOfDateTypeWithDefaultSerializer(value: Date, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode) {
+        const s: IRDFSerializer = new ISODateSerializer();
+        const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
+        const qq = this.createQuad(subject, predicate, objectLiteral);
+        this.quadsArr.push(qq);
     }
 
     private processArrayOfObjectValues(values: any[], subject: RDF.Term, predicate: RDF.Term): void {

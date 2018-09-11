@@ -169,7 +169,7 @@ describe('Testing basic serialization functions', () => {
         u.birthDate = new Date('1995-12-17T03:24:00');
 
         const r = RdfMapper.serialize(u);
-        // console.log(r);
+        console.log(r);
     });
 
     it('Should serialize into a blank node', () => {

@@ -90,7 +90,7 @@ export class DeserializerProcessor {
     private getNumTriplesByBeanType(beanType: string, store: N3.N3Store, ns: IRdfNamespaces): N3.Quad[] {
         let numTriples: N3.Quad[];
         if (beanType) {
-            const beanTypeUri = Utils.getUriFromPrefixedName(beanType, ns); // - this can be undefined
+            const beanTypeUri = Utils.getUriFromPrefixedName(beanType, ns);
             numTriples = store.getQuads(null, N3.DataFactory.namedNode(this.xsdType), N3.DataFactory.namedNode(beanTypeUri), null);
         } else {
             numTriples = store.getQuads(null, null, null, null);
