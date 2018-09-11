@@ -69,7 +69,6 @@ export class DeserializerProcessor {
 
                     if (N3.Util.isNamedNode(ob) || N3.Util.isBlankNode(ob)) {
                         if (rdfProp.decoratorMetadata.isArray) {
-                            // const holder = [];
                             objects.forEach(o => {
                                 const res = this.process(rdfProp.decoratorMetadata.clazz, store, o);
                                 holder.push(res);
@@ -98,12 +97,20 @@ export class DeserializerProcessor {
             case XSDDataType.XSD_NON_POSITIVE_INTEGER:
             case XSDDataType.XSD_POSITIVE_INTEGER:
             case XSDDataType.XSD_NON_POSITIVE_INTEGER:
+            case XSDDataType.XSD_NEGATIVE_INTEGER:
                 result = parseInt(value);
                 break;
             case XSDDataType.XSD_DOUBLE:
             case XSDDataType.XSD_DECIMAL:
             case XSDDataType.XSD_FLOAT:
                 result = parseFloat(value);
+                break;
+            case XSDDataType.XSD_BOOLEAN:
+                if (value === 'true') {
+                    result = true;
+                } else {
+                    result = false;
+                }
                 break;
             default:
                 result = value;
