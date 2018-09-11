@@ -3,6 +3,7 @@ import * as RDF from 'rdf-js';
 import {IRdfPrefixes} from '../annotations/interfaces/IRdfPrefixes';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
+import {XSDDataType} from '../annotations/XSDDataType';
 import {Utils} from '../Utils';
 
 interface QuadsAndPrefixes {
@@ -58,10 +59,11 @@ export class DeserializerProcessor {
                     let holder = [];
                     if (N3.Util.isLiteral(ob)) {
                         if (rdfProp.decoratorMetadata.isArray) {
-                            holder = objects.map(o => o.value);
+                            holder = objects.map(o => this.processPrimitiveByXSDType(o.value, rdfProp.decoratorMetadata.xsdType));
                             dtoInstance[rdfProp.key] = holder;
                         } else {
-                            dtoInstance[rdfProp.key] = ob.value;
+                            const r = this.processPrimitiveByXSDType(ob.value, rdfProp.decoratorMetadata.xsdType);
+                            dtoInstance[rdfProp.key] = r;
                         }
                     }
 
@@ -85,6 +87,28 @@ export class DeserializerProcessor {
 
         return dtoInstance;
 
+    }
+
+    private processPrimitiveByXSDType(value: string, xsdType: string): any {
+        let result;
+        switch (xsdType) {
+            case XSDDataType.XSD_INTEGER:
+            case XSDDataType.XSD_INT:
+            case XSDDataType.XSD_NON_NEGATIVE_INTEGER:
+            case XSDDataType.XSD_NON_POSITIVE_INTEGER:
+            case XSDDataType.XSD_POSITIVE_INTEGER:
+            case XSDDataType.XSD_NON_POSITIVE_INTEGER:
+                result = parseInt(value);
+                break;
+            case XSDDataType.XSD_DOUBLE:
+            case XSDDataType.XSD_DECIMAL:
+            case XSDDataType.XSD_FLOAT:
+                result = parseFloat(value);
+                break;
+            default:
+                result = value;
+        }
+        return result;
     }
 
     private getNumTriplesByBeanType(beanType: string, store: N3.N3Store, ns: IRdfPrefixes): N3.Quad[] {

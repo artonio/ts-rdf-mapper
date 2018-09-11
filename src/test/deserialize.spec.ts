@@ -47,7 +47,7 @@ describe('Test TTL Deserialization', () => {
         expect(template.patientInformation.elements[0].index).toEqual(0);
         expect(template.patientInformation.elements[0].label).toEqual('Demographics');
         expect(template.patientInformation.elements[0].tag).toEqual('demographics');
-        // console.log(JSON.stringify(template));
+        console.log(JSON.stringify(template));
         done();
     });
 });
