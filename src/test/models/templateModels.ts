@@ -59,12 +59,23 @@ export class QaTemplateElement {
     htmlSnippet: string;
     @RdfProperty({predicate: 'dswaSubElementProperty:htmlSummarySnippet', xsdType: XSDDataType.XSD_STRING})
     htmlSummarySnippet: string;
-    @RdfProperty({predicate: 'dswaSubElementProperty:gindex', xsdType: XSDDataType.XSD_INTEGER})
+
     index: number;
+
+    @RdfProperty({predicate: 'dswaSubElementProperty:gindex', xsdType: XSDDataType.XSD_INTEGER})
+    set _index(value: any) {
+        this.index = parseInt(value);
+    }
+
     @RdfProperty({predicate: 'dswaSubElementProperty:label', xsdType: XSDDataType.XSD_STRING})
     label: string;
-    @RdfProperty({predicate: 'dswaSubElementProperty:maxstring', xsdType: XSDDataType.XSD_INTEGER})
+
     maxstring: number;
+
+    @RdfProperty({predicate: 'dswaSubElementProperty:maxstring', xsdType: XSDDataType.XSD_INTEGER})
+    set _maxstring(value: any) {
+        this.maxstring = parseInt(value);
+    }
     @RdfProperty({predicate: 'dswaSubElementProperty:path', xsdType: XSDDataType.XSD_STRING})
     path: string;
     rangeAliasSet: boolean;

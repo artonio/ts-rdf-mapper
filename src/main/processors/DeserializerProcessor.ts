@@ -52,15 +52,22 @@ export class DeserializerProcessor {
                 } else {
                     objects = store.getObjects(triple.subject, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
                 }
+
                 if (objects.length > 0) {
                     const ob: RDF.Term = objects[0];
+                    let holder = [];
                     if (N3.Util.isLiteral(ob)) {
-                        dtoInstance[rdfProp.key] = ob.value;
+                        if (rdfProp.decoratorMetadata.isArray) {
+                            holder = objects.map(o => o.value);
+                            dtoInstance[rdfProp.key] = holder;
+                        } else {
+                            dtoInstance[rdfProp.key] = ob.value;
+                        }
                     }
 
                     if (N3.Util.isNamedNode(ob) || N3.Util.isBlankNode(ob)) {
                         if (rdfProp.decoratorMetadata.isArray) {
-                            const holder = [];
+                            // const holder = [];
                             objects.forEach(o => {
                                 const res = this.process(rdfProp.decoratorMetadata.clazz, store, o);
                                 holder.push(res);
