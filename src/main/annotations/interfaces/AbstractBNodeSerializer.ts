@@ -23,7 +23,7 @@ export type RDFResourceIRI = RDF.NamedNode;
 export type RDFBlankNode = RDF.BlankNode;
 
 /**
- * This class can be extended whenever you may want to serialize a value that is a json object or an array
+ * This class can be extended whenever you may want to serialize a value that is a json object
  *
  * The value will be passed to the class that will extend AbstractBNodeSerializer
  *
