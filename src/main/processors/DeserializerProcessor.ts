@@ -4,6 +4,7 @@ import {IRdfPrefixes} from '../annotations/interfaces/IRdfPrefixes';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
 import {XSDDataType} from '../annotations/XSDDataType';
+import {TurtleParseError} from '../exceptions/TurtleParseError';
 import {Utils} from '../Utils';
 
 interface QuadsAndPrefixes {
@@ -21,14 +22,20 @@ export class DeserializerProcessor {
         let qa: QuadsAndPrefixes;
         try {
             qa = await this.getQuadsAndPrefixes(ttlData);
-        } catch (e) {
-            throw new Error(e);
-        }
-        const store: N3.N3Store = N3.Store();
-        store.addQuads(qa.quads);
-        const dtoInstance = this.process(type, store);
+            const store: N3.N3Store = N3.Store();
+            store.addQuads(qa.quads);
+            const dtoInstance = this.process(type, store);
 
-        return Promise.resolve(dtoInstance);
+            return Promise.resolve(dtoInstance);
+        } catch (e) {
+            // console.log(e)
+            throw new TurtleParseError(e);
+        }
+        // const store: N3.N3Store = N3.Store();
+        // store.addQuads(qa.quads);
+        // const dtoInstance = this.process(type, store);
+        //
+        // return Promise.resolve(dtoInstance);
     }
 
     private process<T>(type: { new(): T }, store: N3.N3Store, object?: RDF.Term): T {

@@ -6,7 +6,8 @@ module.exports = {
         process.cwd() + '/src/main/List.ts',
         process.cwd() + '/src/main/processors/*',
         process.cwd() + '/src/main/annotations/interfaces/IRdfPropertyMetadata.ts',
-        process.cwd() + '/src/main/annotations/interfaces/IRdfSubjectMetadata.ts'
+        process.cwd() + '/src/main/annotations/interfaces/IRdfSubjectMetadata.ts',
+        process.cwd() + '/src/main/RDFSerializers/*'
     ],
 
     mode: 'file',

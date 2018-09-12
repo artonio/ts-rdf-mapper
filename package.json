@@ -49,6 +49,6 @@
     "typings": "^0.8.1"
   },
   "dependencies": {
-    "@types/n3": "^1.0.0"
+    "@types/n3": "^1.0.1"
   }
 }

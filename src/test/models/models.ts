@@ -139,6 +139,20 @@ export class Calendar {
 
 }
 
+export const invalidTTL = `
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+prefix person: <http://example.com/Person/> .
+
+person:1234567      a                       foaf:Person ;
+        foaf:firstName          "David" ;
+        foaf:name               "David Banner" ;
+        foaf:nick               "hulk" ;
+        foaf:surname            "Banner" ;
+        foaf:title              "Mr"
+`
+;
+
 export const personTTL = `
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .

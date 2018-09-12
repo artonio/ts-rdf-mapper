@@ -9,6 +9,7 @@ import {User} from './models/litralSerializer';
 import {Addr, Calendar, Days, Per, PersonMultipleDataTypes, SuperBase} from './models/models';
 import {Address} from './models/oneToOneModels';
 import {Recipe, Video} from './models/recipes';
+import {Recipe1, Video1} from './models/serializeIsIRI';
 import {UserJsonObject} from './models/serializeJsonObj';
 
 describe('Testing basic serialization functions', () => {
@@ -178,6 +179,16 @@ describe('Testing basic serialization functions', () => {
 
         const video: Video = new Video();
         video.name = 'Japanese Cheesecake instructions';
+        recipe.video = video;
+        const r = RdfMapper.serialize(recipe);
+        console.log(r);
+    });
+
+    it('Serialize into blank node with isIRI', () => {
+        const recipe: Recipe1 = new Recipe1();
+        recipe.recipeName = 'Cheesecake';
+        const video: Video1 = new Video1();
+        video.url = 'http://example.com/Video1';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
         console.log(r);

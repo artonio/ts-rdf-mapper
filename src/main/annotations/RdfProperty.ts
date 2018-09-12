@@ -33,6 +33,11 @@ const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any) => {
     });
 };
 
+/**
+ * Used to annotate object properties
+ * @param prop
+ * @constructor
+ */
 export const RdfProperty = (prop: IRdfProperty) => {
     return (target: Object, key: string) => {
         makeRDFPropertyMapper(target, key, prop);

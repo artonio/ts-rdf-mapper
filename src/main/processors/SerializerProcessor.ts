@@ -6,12 +6,10 @@ import {IRdfPrefixes} from '../annotations/interfaces/IRdfPrefixes';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRDFSerializer} from '../annotations/interfaces/IRDFSerializer';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
+import {IllegalArgumentError} from '../exceptions/IllegalArgumentError';
 import {ISODateSerializer} from '../RDFSerializers/ISODateSerializer';
 import {Utils} from '../Utils';
 
-/**
- * @ignore
- */
 export class SerializerProcessor {
 
     // N3 writer
@@ -56,7 +54,6 @@ export class SerializerProcessor {
                 const prefixxes: N3.Prefixes = this.getN3NsPrefixObject(ns);
                 this.prefixes = {...this.prefixes, ...prefixxes};
             }
-            // this.n3Writer.addPrefixes(prefixxes); waiting for DefinitelyTyped merge
             // If @RdfBean is present, we create at triple in form of ?subject a ?object
             if (beanType) {
                 const resourceIdentifierQuad: RDF.Quad = this.createQuad(subject, this.xsdType, N3.DataFactory.namedNode(beanType));
@@ -79,8 +76,12 @@ export class SerializerProcessor {
                         xsdDataType = N3.DataFactory.namedNode(xsdDataTypeString);
                     }
                     const lang: string = p.decoratorMetadata.lang;
+                    const isIRI: boolean = p.decoratorMetadata.isIRI;
                     if (lang && xsdDataTypeString) {
-                        throw new Error(`Key ${p.key} cannot have both lang and xsdType present inside the decorator`);
+                        throw new IllegalArgumentError(`Key ${p.key} cannot have both lang and xsdType present inside the decorator`);
+                    }
+                    if ( lang && xsdDataTypeString && isIRI || lang && isIRI || xsdDataTypeString && isIRI) {
+                        throw new IllegalArgumentError(`Key ${p.key} cannot have both lang or xsdType present when isIRI is set to true inside the decorator`);
                     }
 
                     // If value is set for the current key, process it
@@ -91,7 +92,7 @@ export class SerializerProcessor {
                         }
                         // If not clazz annotated, then it's a literal
                         else {
-                            this.processPrimitiveValue(p.val, subject, predicate, xsdDataType, lang, serializer);
+                            this.processPrimitiveValue(p.val, subject, predicate, xsdDataType, lang, isIRI, serializer);
                         }
                     }
                 });
@@ -114,13 +115,19 @@ export class SerializerProcessor {
 
     private processArrayOfPrimitiveValues(value: any[], subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {}
 
-    private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, lang: string, serializer?: any): void {
+    private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, lang: string, isIRI: boolean, serializer?: any): void {
         if (serializer) {
             this.processPrimiteValueWithAnnotatedSerializer(value, subject, predicate, xsdDataType, lang, serializer);
         } else {
             if (value instanceof Date) {
                 this.processValueOfDateTypeWithDefaultSerializer(value, subject, predicate, xsdDataType);
-            } else {
+            }
+            else if (isIRI) {
+                const objectResource: RDF.NamedNode = N3.DataFactory.namedNode(value);
+                const q = this.createQuad(subject, predicate, objectResource);
+                this.quadsArr.push(q);
+            }
+            else {
                 let objectLiteral: RDF.Literal;
                 if (lang) {
                     objectLiteral = this.makeLiteral(value, lang);
