@@ -13,10 +13,10 @@ look in test folder for tests
 - [Features](#features)
 - [Examples And Usage](#examples-and-usage)
     * [Decorators](#decorators)
-        + [RdfPrefixes](#@rdfprefixes)
-        + [RdfBean](#@rdfbean)
-        + [RdfSubject](#@rdfsubject)
-        + [RdfProperty](#@rdfproperty)
+        + [RdfPrefixes](#rdfprefixes)
+        + [RdfBean](#rdfbean)
+        + [RdfSubject](#rdfsubject)
+        + [RdfProperty](#rdfproperty)
     * [Serialize](#serialize)
     * [Deserialize](#deserialize)
 
@@ -35,7 +35,7 @@ look in test folder for tests
 
 # Examples And Usage
 ## Decorators
-### @RdfPrefixes
+### RdfPrefixes
 > decorator specifies one or more RDF namespace prefixes in the format *[key: string]: string*. i.e 
 
 ```ts
@@ -45,7 +45,7 @@ look in test folder for tests
 })
 class Person {}
 ```
-### @RdfBean
+### RdfBean
 > **OPTIONAL** - Defines the type (xsd:type) of Resource. If this decorator is not present, a blank node will be created
 
 Example:
@@ -86,8 +86,8 @@ _:b1 a foaf:Person;
 
 @RdfBean should be present on the parent class for proper deserialization
 
-### @RdfSubject
-###@RdfProperty
+### RdfSubject
+### RdfProperty
 
 ## Serialize
 
