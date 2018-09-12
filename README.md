@@ -10,6 +10,8 @@ Library written in typescript using reflect-metadata. Decorators are used to ann
 
 look in test folder for tests
 
+[Typescript Docs and Examples](https://antonsuhovatkin.bitbucket.io/)
+
 - [Features](#features)
 - [Examples And Usage](#examples-and-usage)
     * [Decorators](#decorators)
@@ -21,22 +23,19 @@ look in test folder for tests
     * [Deserialize](#deserialize)
 
 
-<a name="features"></a>
 # Features
 
 * Map Typescript primitives to standard XML-Schema literals
 * Serialize Typescript Date objects with built-in ISO Date Serializer
 * Implement IRDFSerializer interface to serialize Date objects or primitives however you want
 * Serialize strings with a xsd datatype or a lang tag i.e 'Pineapple'@en, 'Ananas'@ru
-* Supports recursive data structures
+* Recursive data structures support
 * Inheritance Support
 * Serialize/Deserialize Blank Nodes
 * Serialize/Deserialize plain json objects by extending AbstractBNodeSerializer
 * Proven javascript library N3.js under the hood
 
-<a name="examples-and-usage"></a>
 # Examples And Usage
-<a name="decorators"></a>
 ## Decorators
 ### RdfPrefixes
 > decorator specifies one or more RDF namespace prefixes in the format *[key: string]: string*. i.e 
@@ -118,28 +117,7 @@ _:b1 a foaf:Person;
 ```
 
 ### RdfProperty
-
+> Used to annotate object properties. Can also be used to annotate typescript setters
 ## Serialize
 
 ## Deserialize
-
-
-```ts
-@RdfPrefixes([
-    {prefix: 'foaf', uri: 'http://xmlns.com/foaf/0.1/'},
-    {prefix: 'person', uri: 'http://example.com/Person/'}
-])
-@RdfBean('foaf:Person')
-class Person {
-
-    @RdfSubject('person')
-    public uuid: string;
-
-    @RdfProperty({prop: 'person:name', xsdType: XSDDataType.XSD_STRING})
-    public name: string;
-
-    @RdfProperty({prop: 'person:gender', xsdType: XSDDataType.XSD_STRING})
-    public gender: string;
-
-}
-```
