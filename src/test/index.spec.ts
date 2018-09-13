@@ -6,9 +6,10 @@ import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
 import {User} from './models/litralSerializer';
-import {Addr, Calendar, Days, Per, PersonMultipleDataTypes, SuperBase} from './models/models';
+import {Addr, Calendar, Days, Per, PersonHasFriend, PersonMultipleDataTypes, SuperBase} from './models/models';
 import {Address} from './models/oneToOneModels';
 import {Recipe, Video} from './models/recipes';
+import {RdfIngredient, RdfRecipe} from './models/recipesManyToMany';
 import {Recipe1, Video1} from './models/serializeIsIRI';
 import {UserJsonObject} from './models/serializeJsonObj';
 
@@ -88,6 +89,50 @@ describe('Testing basic serialization functions', () => {
 
         // console.log(b);
 
+    });
+
+    it('Serialize person has friend person', () => {
+        const antonPerson: PersonHasFriend = new PersonHasFriend();
+        antonPerson.uuid = 'Anton';
+        antonPerson.name = 'Anton S';
+
+        const oscarPerson: PersonHasFriend = new PersonHasFriend();
+        oscarPerson.uuid = 'Oscar';
+        oscarPerson.name = 'Oscar Sisek';
+        antonPerson.knows = oscarPerson;
+
+        const r = RdfMapper.serialize(antonPerson);
+        expect(r).toContain(`person:Oscar a foaf:Person;`);
+        expect(r).toContain(`foaf:knows person:Anton;`);
+        expect(r).toContain(`foaf:name "Oscar Sisek"^^xsd:string.`);
+        expect(r).toContain(`person:Anton a foaf:Person;`);
+        expect(r).toContain(`foaf:name "Anton S"^^xsd:string;`);
+        expect(r).toContain(`foaf:knows person:Oscar.`);
+        console.log(r);
+
+    });
+
+    it('Serialize Recipe has many ingredients and inverseof', () => {
+        const recipe: RdfRecipe = new RdfRecipe();
+        recipe.recipeIdentifier = 'Lasagna';
+        recipe.recipeName = 'Lasagna';
+
+        const beefIngredient: RdfIngredient = new RdfIngredient();
+        beefIngredient.ingredientIdentifier = 'beef';
+        beefIngredient.ingredientName = 'Ground Beef';
+        beefIngredient.quantity = 200;
+        beefIngredient.qualifier = 'grams';
+
+        const spaghettiSauce: RdfIngredient = new RdfIngredient();
+        spaghettiSauce.ingredientIdentifier = 'spag';
+        spaghettiSauce.ingredientName = 'Spaghetti Sauce';
+        spaghettiSauce.quantity = 800;
+        spaghettiSauce.qualifier = 'grams';
+
+        recipe.ingredients = [beefIngredient, spaghettiSauce];
+
+        const r = RdfMapper.serialize(recipe);
+        console.log(r);
     });
 
     it('Serialize one to many relationship', () => {

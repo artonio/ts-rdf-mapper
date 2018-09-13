@@ -36,7 +36,6 @@ describe('Meaningful Exceptions should be thrown', () => {
             expect(e instanceof IllegalArgumentError).toBeTruthy();
             expect(e.name).toEqual('IllegalArgumentError');
             expect(e.message).toEqual('Key firstName cannot have both lang or xsdType present when isIRI is set to true inside the decorator');
-            console.log(e.message);
         }
     });
 });

@@ -43,6 +43,22 @@ export class PersonMultipleDataTypes {
 
 @RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
+@RdfBean('foaf:Person')
+export class PersonHasFriend {
+    @RdfSubject('person')
+    public uuid: string;
+
+    @RdfProperty({predicate: 'foaf:name', xsdType: XSDDataType.XSD_STRING})
+    public name: string;
+
+    @RdfProperty({predicate: 'foaf:knows', clazz: PersonHasFriend, inverseOfPredicate: 'foaf:knows'})
+    public knows: PersonHasFriend;
+}
+
+@RdfPrefixes({
+    foaf: 'http://xmlns.com/foaf/0.1/',
     person: 'http://example.com/Person/',
     address: 'http://xmlns.com/foaf/0.1/address/'
 })

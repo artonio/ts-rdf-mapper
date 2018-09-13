@@ -98,6 +98,8 @@ export interface IRdfProperty {
      */
     isIRI?: boolean;
 
+    inverseOfPredicate?: string;
+
     /**
      * Serializer must either extend [[AbstractBNodeSerializer]] class or implement the [[IRDFSerializer]] interface
      */
