@@ -22,7 +22,7 @@ export class SerializerProcessor {
 
     constructor() {
         this.prefixes = {xsd: N3.DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#')};
-        this.n3Writer = N3.Writer();
+        // this.n3Writer = N3.Writer();
     }
 
     /**
@@ -33,8 +33,8 @@ export class SerializerProcessor {
     public serialize<T>(target: T | T[]): string {
         this.process(target);
         this.sortQuads(this.quadsArr);
-        // this.n3Writer = N3.Writer({prefixes: this.prefixes});
-        this.n3Writer.addPrefixes(this.prefixes);
+        this.n3Writer = N3.Writer({prefixes: this.prefixes});
+        // this.n3Writer.addPrefixes(this.prefixes);
         this.n3Writer.addQuads(this.quadsArr);
         return this.getTTLString();
     }
@@ -231,9 +231,13 @@ export class SerializerProcessor {
     private makeSubject(rdfSubjectDecorator?: IRdfSubjectMetadata): RDF.Term {
         let subject: RDF.Term;
         if (rdfSubjectDecorator) {
-            if (/^(http|https):\/\/?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(rdfSubjectDecorator.prop)) {
+            if (
+                /^(http|https):\/\/?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
+                .test(rdfSubjectDecorator.prop) || rdfSubjectDecorator.prop === 'http://')
+            {
                 subject = N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}${rdfSubjectDecorator.val}`);
-            } else {
+            }
+            else {
                 subject = N3.DataFactory.namedNode(`${rdfSubjectDecorator.prop}:${rdfSubjectDecorator.val}`);
             }
         } else {

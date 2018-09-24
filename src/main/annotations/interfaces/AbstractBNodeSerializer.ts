@@ -124,6 +124,12 @@ export abstract class AbstractBNodeSerializer {
      *
      */
     protected subject: RDFBlankNode;
+
+    /**
+     * Used to create a triple with a resource identifier
+     * i.e ?subject a ?object
+     */
+    protected readonly xsdType: RDFResourceIRI = N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
     /**
      * @hidden
      */

@@ -244,7 +244,7 @@ describe('Testing basic serialization functions', () => {
         u.name = 'Anton';
         u.address = {streetName: 'St Clair', streetNumber: 223, isRegistered: true};
         const r = RdfMapper.serialize(u);
-        // console.log(r);
+        console.log(r);
     });
 
 });

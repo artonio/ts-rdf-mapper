@@ -25,6 +25,8 @@ export class AddressSerializer extends AbstractBNodeSerializer {
     serialize(value: Object): RDFTriple[] {
         const triples: RDFTriple[] = [];
 
+        triples.push(this.createTriple(this.subject, this.xsdType, this.makeResourceIRI('address:1234')));
+
         Object.keys(value).forEach(key => {
             const predicate: RDFResourceIRI = this.makePredicate(`address:${key}`);
             let obj: RDFLiteral;

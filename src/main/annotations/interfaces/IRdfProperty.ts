@@ -66,11 +66,6 @@ export interface IRdfProperty {
     lang?: string;
 
     /**
-     * Is RDF List
-     */
-    isRDFList?: boolean;
-
-    /**
      * Specify if this is an array
      *
      * this property is required for deserializing from turtle
