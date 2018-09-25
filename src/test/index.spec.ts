@@ -39,6 +39,21 @@ describe('Testing basic serialization functions', () => {
 
     });
 
+    it('Should serialize basic, change properties', () => {
+        const p = new PersonMultipleDataTypes();
+        p.gender = 'M';
+        p.uuid = '123345dfx';
+        p.name = 'Anton';
+        p.name = 'Ant';
+        p.name = 'John';
+
+        const b = RdfMapper.serialize(p);
+        expect(b).toContain(`person:123345dfx a foaf:Person;`);
+        expect(b).toContain(`person:name "John"`);
+        expect(b).toContain(`person:gender "M"^^xsd:string;`);
+        console.log(b);
+    });
+
     it('Serialize one to one relationship', () => {
         @RdfPrefixes({
             foaf: 'http://xmlns.com/foaf/0.1/',
