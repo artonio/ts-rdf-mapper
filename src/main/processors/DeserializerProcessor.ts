@@ -1,7 +1,4 @@
-import * as N3 from 'n3';
-import {Quad} from 'n3';
-import {BaseQuad} from 'n3';
-import * as RDF from 'rdf-js';
+import {DataFactory, N3Parser, N3Store, Parser, Prefixes, Quad, Quad_Object, Store, Util} from 'n3';
 import {IRdfPrefixes} from '../annotations/interfaces/IRdfPrefixes';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
@@ -10,8 +7,8 @@ import {TurtleParseError} from '../exceptions/TurtleParseError';
 import {Utils} from '../Utils';
 
 interface QuadsAndPrefixes {
-    quads: N3.Quad[];
-    prefixes: N3.Prefixes;
+    quads: Quad[];
+    prefixes: Prefixes;
 }
 
 export class DeserializerProcessor {
@@ -24,7 +21,7 @@ export class DeserializerProcessor {
         let qa: QuadsAndPrefixes;
         try {
             qa = await this.getQuadsAndPrefixes(ttlData);
-            const store: N3.N3Store = N3.Store();
+            const store: N3Store = new Store();
             store.addQuads(qa.quads);
             const dtoInstance = this.process(type, store);
 
@@ -38,7 +35,7 @@ export class DeserializerProcessor {
         let qs: Quad[];
         try {
             qs = this.getQuads(ttlData);
-            const store: N3.N3Store = N3.Store();
+            const store: N3Store = new Store();
             store.addQuads(qs);
             const dtoInstance: T = this.process(type, store);
             return dtoInstance;
@@ -47,7 +44,7 @@ export class DeserializerProcessor {
         }
     }
 
-    private process<T>(type: { new(): T }, store: N3.N3Store, object?: RDF.Term): T {
+    private process<T>(type: { new(): T }, store: N3Store, object?: Quad_Object): T {
         const dtoInstance = new type();
 
         const ns: IRdfPrefixes = Reflect.getMetadata('RdfPrefixes', type.prototype);
@@ -55,25 +52,25 @@ export class DeserializerProcessor {
         const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty-non-instance', type.prototype);
         const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject-non-instance', type.prototype);
 
-        const numTriples: N3.Quad[] = this.getNumTriplesByBeanType(beanType, store, ns);
+        const numTriples: Quad[] = this.getNumTriplesByBeanType(beanType, store, ns);
         if (numTriples.length > 0) {
-            const triple: N3.Quad = numTriples[0];
+            const triple: Quad = numTriples[0];
             // Get URI and set the value for key which contains @RdfSubject annotation
             if (subject) {
                 dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(triple.subject.value, subject.prop, ns);
             }
             properties.forEach((rdfProp: IRdfPropertyMetadata) => {
-                let objects: RDF.Term[];
+                let objects: Quad_Object[];
                 if (object) {
-                    objects = store.getObjects(object, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
+                    objects = store.getObjects(object, DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
                 } else {
-                    objects = store.getObjects(triple.subject, N3.DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
+                    objects = store.getObjects(triple.subject, DataFactory.namedNode(Utils.getUriFromPrefixedName(rdfProp.decoratorMetadata.predicate, ns)), null);
                 }
 
                 if (objects.length > 0) {
-                    const ob: RDF.Term = objects[0];
+                    const ob: Quad_Object = objects[0];
                     let holder = [];
-                    if (N3.Util.isLiteral(ob)) {
+                    if (Util.isLiteral(ob)) {
                         if (rdfProp.decoratorMetadata.isArray) {
                             holder = objects.map(o => this.processPrimitiveByXSDType(o.value, rdfProp.decoratorMetadata.xsdType));
                             dtoInstance[rdfProp.key] = holder;
@@ -83,7 +80,7 @@ export class DeserializerProcessor {
                         }
                     }
 
-                    if (N3.Util.isNamedNode(ob) || N3.Util.isBlankNode(ob)) {
+                    if (Util.isNamedNode(ob) || Util.isBlankNode(ob)) {
                         if (rdfProp.decoratorMetadata.isArray) {
                             objects.forEach(o => {
                                 const res = this.process(rdfProp.decoratorMetadata.clazz, store, o);
@@ -134,11 +131,11 @@ export class DeserializerProcessor {
         return result;
     }
 
-    private getNumTriplesByBeanType(beanType: string, store: N3.N3Store, ns: IRdfPrefixes): Quad[] {
+    private getNumTriplesByBeanType(beanType: string, store: N3Store, ns: IRdfPrefixes): Quad[] {
         let numTriples: Quad[];
         if (beanType) {
             const beanTypeUri = Utils.getUriFromPrefixedName(beanType, ns);
-            numTriples = store.getQuads(null, N3.DataFactory.namedNode(this.xsdType), N3.DataFactory.namedNode(beanTypeUri), null);
+            numTriples = store.getQuads(null, DataFactory.namedNode(this.xsdType), DataFactory.namedNode(beanTypeUri), null);
         } else {
             numTriples = store.getQuads(null, null, null, null);
         }
@@ -147,10 +144,10 @@ export class DeserializerProcessor {
     }
 
     private async getQuadsAndPrefixes(ttlData: string): Promise<QuadsAndPrefixes> {
-        const parser: N3.N3Parser = new N3.Parser();
+        const parser: N3Parser = new Parser();
         return new Promise<QuadsAndPrefixes>((resolve, reject) => {
-            const quads: N3.Quad[] = [];
-            parser.parse(ttlData, (e: Error, q: N3.Quad, p: N3.Prefixes) => {
+            const quads: Quad[] = [];
+            parser.parse(ttlData, (e: Error, q: Quad, p: Prefixes) => {
                 if (e) {
                     reject(e);
                 }
@@ -165,7 +162,7 @@ export class DeserializerProcessor {
     }
 
     private getQuads(ttlData: string): Quad[] {
-        const parser: N3.N3Parser = new N3.Parser();
+        const parser: N3Parser = new Parser();
         const r: Quad[] = parser.parse(ttlData);
         return r;
     }

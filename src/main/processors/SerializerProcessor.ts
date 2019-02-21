@@ -51,7 +51,7 @@ export class SerializerProcessor {
         return this.getTTLString();
     }
 
-    private process<T>(target: T | T[], previousSubject?: Term, pointBackPredicate?: string): Term {
+    private process<T>(target: T | T[], previousSubject?: Quad_Subject, pointBackPredicate?: string): Quad_Subject {
         if (Array.isArray(target)) {
             target.forEach((tar: T) => {
                 this.process(tar);
@@ -127,9 +127,9 @@ export class SerializerProcessor {
     }
 
     private processClazzAnnotatedPropertyValue(value: any | any[],
-                                               subject: RDF.Term,
-                                               predicate: RDF.Term,
-                                               xsdDataType: RDF.NamedNode,
+                                               subject: Quad_Subject,
+                                               predicate: Quad_Predicate,
+                                               xsdDataType: NamedNode,
                                                inversedPredicate: string,
                                                serializer: any): void {
         if (Array.isArray(value)) {
@@ -139,9 +139,9 @@ export class SerializerProcessor {
         }
     }
 
-    private processArrayOfPrimitiveValues(value: any[], subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, serializer?: any): void {}
+    private processArrayOfPrimitiveValues(value: any[], subject: Quad_Subject, predicate: Quad_Predicate, xsdDataType: NamedNode, serializer?: any): void {}
 
-    private processPrimitiveValue(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, lang: string, isIRI: boolean, serializer?: any): void {
+    private processPrimitiveValue(value: any, subject: Quad_Subject, predicate: Quad_Predicate, xsdDataType: NamedNode, lang: string, isIRI: boolean, serializer?: any): void {
         if (serializer) {
             this.processPrimiteValueWithAnnotatedSerializer(value, subject, predicate, xsdDataType, lang, serializer);
         } else {
@@ -149,12 +149,12 @@ export class SerializerProcessor {
                 this.processValueOfDateTypeWithDefaultSerializer(value, subject, predicate, xsdDataType);
             }
             else if (isIRI) {
-                const objectResource: RDF.NamedNode = N3.DataFactory.namedNode(value);
+                const objectResource: NamedNode = DataFactory.namedNode(value);
                 const q = this.createQuad(subject, predicate, objectResource);
                 this.quadsArr.push(q);
             }
             else {
-                let objectLiteral: RDF.Literal;
+                let objectLiteral: Literal;
                 if (lang) {
                     objectLiteral = this.makeLiteral(value, lang);
                 }
@@ -168,15 +168,15 @@ export class SerializerProcessor {
     }
 
     private processClazzAnnotatedObjectValue(value: any,
-                                             subject: RDF.Term,
-                                             predicate: RDF.Term,
-                                             xsdDataType: RDF.NamedNode,
+                                             subject: Quad_Subject,
+                                             predicate: Quad_Predicate,
+                                             xsdDataType: NamedNode,
                                              inversedPredicate: string,
                                              serializer: any): void {
         if (serializer)
         {
             const s: IRDFSerializer = this.getOrCreateSerializer(serializer);
-            const objectLiteral: RDF.Literal = this.makeLiteral(s.serialize(value), xsdDataType);
+            const objectLiteral: Literal = this.makeLiteral(s.serialize(value), xsdDataType);
             const q = this.createQuad(subject, predicate, objectLiteral);
             this.quadsArr.push(q);
         }
@@ -186,11 +186,11 @@ export class SerializerProcessor {
                 this.processValueOfDateTypeWithDefaultSerializer(value, subject, predicate, xsdDataType);
             } else {
                 if (inversedPredicate) {
-                    const resultObject: RDF.Term = this.process(value, subject, inversedPredicate); // returns NamedNode
+                    const resultObject: Term = this.process(value, subject, inversedPredicate); // returns NamedNode
                     const q = this.createQuad(subject, predicate, resultObject);
                     this.quadsArr.push(q);
                 } else {
-                    const resultObject: RDF.Term = this.process(value); // returns NamedNode
+                    const resultObject: Term = this.process(value); // returns NamedNode
                     const q = this.createQuad(subject, predicate, resultObject);
                     this.quadsArr.push(q);
                 }
@@ -198,7 +198,7 @@ export class SerializerProcessor {
         }
     }
 
-    private processPrimiteValueWithAnnotatedSerializer(value: any, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode, lang: string, serializer: any) {
+    private processPrimiteValueWithAnnotatedSerializer(value: any, subject: Quad_Subject, predicate: Quad_Predicate, xsdDataType: NamedNode, lang: string, serializer: any) {
         const s: any = this.getOrCreateSerializer(serializer);
         if (s.isBnodeSerializer) {
             this.prefixes = {...this.prefixes, ...s.prefixes};
@@ -206,7 +206,7 @@ export class SerializerProcessor {
             this.quadsArr.push(...s.serialize(value));
             this.quadsArr.push(q);
         } else {
-            let objectLiteral: RDF.Literal;
+            let objectLiteral: Literal;
             if (lang) {
                 objectLiteral = this.makeLiteral(s.serialize(value), lang);
             }
@@ -218,7 +218,7 @@ export class SerializerProcessor {
         }
     }
 
-    private processValueOfDateTypeWithDefaultSerializer(value: Date, subject: RDF.Term, predicate: RDF.Term, xsdDataType: RDF.NamedNode) {
+    private processValueOfDateTypeWithDefaultSerializer(value: Date, subject: Quad_Subject, predicate: Quad_Predicate, xsdDataType: NamedNode) {
         const s: IRDFSerializer = new ISODateSerializer();
         const objectLiteral: Literal = this.makeLiteral(s.serialize(value), xsdDataType);
         const qq = this.createQuad(subject, predicate, objectLiteral);
@@ -232,7 +232,7 @@ export class SerializerProcessor {
                 const q = this.createQuad(subject, predicate, resultObject);
                 this.quadsArr.push(q);
             } else {
-                const resultObject: RDF.Term = this.process(prop);
+                const resultObject: Quad_Subject = this.process(prop);
                 const q = this.createQuad(subject, predicate, resultObject);
                 this.quadsArr.push(q);
             }
@@ -243,8 +243,8 @@ export class SerializerProcessor {
         return DataFactory.literal(value, languageOrDatatype);
     }
 
-    private makeSubject(rdfSubjectDecorator?: IRdfSubjectMetadata): Term {
-        let subject: Term;
+    private makeSubject(rdfSubjectDecorator?: IRdfSubjectMetadata): Quad_Subject {
+        let subject: Quad_Subject;
         if (rdfSubjectDecorator) {
             if (
                 /^(http|https):\/\/?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
@@ -271,7 +271,7 @@ export class SerializerProcessor {
         }
     }
 
-    private createQuad(subject: Quad_Subject, predicate: Quad_Predicate, object: Term): Quad {
+    private createQuad(subject: Quad_Subject, predicate: Quad_Predicate, object: Quad_Object): Quad {
         return DataFactory.quad(
             subject,
             predicate,
