@@ -7,7 +7,7 @@ import {PersonTypeAndIsIRI, PersonTypeAndLang} from './models/wrongfullyAnnotate
 describe('Meaningful Exceptions should be thrown', () => {
     it('Should throw TurtleParseError when turtle is invalid', async (done) => {
         try {
-            const instance: Person = await RdfMapper.deserialize(Person, invalidTTL);
+            const instance: Person = await RdfMapper.deserializeAsync(Person, invalidTTL);
         } catch (e) {
             expect(e instanceof TurtleParseError).toBeTruthy();
             expect(e.name).toEqual('TurtleParseError');

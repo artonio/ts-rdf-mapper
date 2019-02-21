@@ -1,4 +1,6 @@
 import * as N3 from 'n3';
+import {Quad} from 'n3';
+import {BaseQuad} from 'n3';
 import * as RDF from 'rdf-js';
 import {IRdfPrefixes} from '../annotations/interfaces/IRdfPrefixes';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
@@ -18,7 +20,7 @@ export class DeserializerProcessor {
 
     constructor() {}
 
-    public async deserialize<T>(type: { new(): T }, ttlData: string): Promise<T> {
+    public async deserializeAsync<T>(type: { new(): T }, ttlData: string): Promise<T> {
         let qa: QuadsAndPrefixes;
         try {
             qa = await this.getQuadsAndPrefixes(ttlData);
@@ -28,14 +30,21 @@ export class DeserializerProcessor {
 
             return Promise.resolve(dtoInstance);
         } catch (e) {
-            // console.log(e)
             throw new TurtleParseError(e);
         }
-        // const store: N3.N3Store = N3.Store();
-        // store.addQuads(qa.quads);
-        // const dtoInstance = this.process(type, store);
-        //
-        // return Promise.resolve(dtoInstance);
+    }
+
+    public deserialize<T>(type: { new(): T }, ttlData: string): T {
+        let qs: Quad[];
+        try {
+            qs = this.getQuads(ttlData);
+            const store: N3.N3Store = N3.Store();
+            store.addQuads(qs);
+            const dtoInstance: T = this.process(type, store);
+            return dtoInstance;
+        } catch (e) {
+            throw new TurtleParseError(e);
+        }
     }
 
     private process<T>(type: { new(): T }, store: N3.N3Store, object?: RDF.Term): T {
@@ -125,8 +134,8 @@ export class DeserializerProcessor {
         return result;
     }
 
-    private getNumTriplesByBeanType(beanType: string, store: N3.N3Store, ns: IRdfPrefixes): N3.Quad[] {
-        let numTriples: N3.Quad[];
+    private getNumTriplesByBeanType(beanType: string, store: N3.N3Store, ns: IRdfPrefixes): Quad[] {
+        let numTriples: Quad[];
         if (beanType) {
             const beanTypeUri = Utils.getUriFromPrefixedName(beanType, ns);
             numTriples = store.getQuads(null, N3.DataFactory.namedNode(this.xsdType), N3.DataFactory.namedNode(beanTypeUri), null);
@@ -153,6 +162,12 @@ export class DeserializerProcessor {
                 }
             });
         });
+    }
+
+    private getQuads(ttlData: string): Quad[] {
+        const parser: N3.N3Parser = new N3.Parser();
+        const r: Quad[] = parser.parse(ttlData);
+        return r;
     }
 
 }

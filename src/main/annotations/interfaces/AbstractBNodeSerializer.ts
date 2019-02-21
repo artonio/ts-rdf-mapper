@@ -1,26 +1,13 @@
-import * as N3 from 'n3';
-import * as RDF from 'rdf-js';
-
-/**
- * Convenience alias type for RDF.Quad from 'rdf-js'
- *
- * It is aliased as triple because we do not need to use the forth argument of N3.js library
- * when serializing data classes to turtle
- *
- */
-export type RDFTriple = RDF.Quad;
-/**
- * Convenience alias type for RDF.Literal from 'rdf-js'
- */
-export type RDFLiteral = RDF.Literal;
-/**
- * Convenience alias type for RDF.NamedNode from 'rdf-js'
- */
-export type RDFResourceIRI = RDF.NamedNode;
-/**
- * Convenience alias type for RDF.BlankNode from 'rdf-js'
- */
-export type RDFBlankNode = RDF.BlankNode;
+import {
+    BlankNode,
+    DataFactory,
+    Literal,
+    NamedNode,
+    Prefixes,
+    Quad_Object,
+    Quad_Predicate,
+    Quad_Subject,
+    Triple} from 'n3';
 
 /**
  * This class can be extended whenever you may want to serialize a value that is a json object
@@ -111,7 +98,7 @@ export abstract class AbstractBNodeSerializer {
      *
      * more prefixes can be added by calling *this.addPrefix(prefix: string, iri: string)*
      */
-    protected prefixes: N3.Prefixes;
+    protected prefixes: Prefixes;
     /**
      * Blank node is created when a developer extends this class. Identifies the *subject* in triple
      *
@@ -123,13 +110,13 @@ export abstract class AbstractBNodeSerializer {
      * with optional id of the blank node
      *
      */
-    protected subject: RDFBlankNode;
+    protected subject: BlankNode;
 
     /**
      * Used to create a triple with a resource identifier
      * i.e ?subject a ?object
      */
-    protected readonly xsdType: RDFResourceIRI = N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+    protected readonly xsdType: NamedNode = DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
     /**
      * @hidden
      */
@@ -185,17 +172,17 @@ export abstract class AbstractBNodeSerializer {
      *
      * @returns An array of triples where each triple in the array corresponds to key:value pairs of the provided json
      */
-    abstract serialize(value: Object): RDFTriple[];
+    abstract serialize(value: Object): Triple[];
 
     /**
      * Create a triple by providing subject predicate object
      *
-     * @param subject - must be of type [[RDFResourceIRI]] or [[RDFBlankNode]]
-     * @param predicate - must be of type [[RDFResourceIRI]]
-     * @param object - must be of type [[RDFResourceIRI]] or [[RDFBlankNode]] or [[RDFLiteral]]
+     * @param subject - must be of type [[Quad_Subject]]
+     * @param predicate - must be of type [[Quad_Predicate]]
+     * @param object - must be of type [[Quad_Object]]
      */
-    protected createTriple(subject: RDF.Term, predicate: RDF.Term, object: RDF.Term): RDFTriple {
-        return N3.DataFactory.quad(
+    protected createTriple(subject: Quad_Subject, predicate: Quad_Predicate, object: Quad_Object): Triple {
+        return DataFactory.quad(
             subject,
             predicate,
             object
@@ -206,7 +193,7 @@ export abstract class AbstractBNodeSerializer {
      * Convenience method to make predicate
      * @param value - *in the form of IRI or prefixed IRI (e.g. xsd:type)*
      */
-    protected makePredicate(value: string): RDFResourceIRI {
+    protected makePredicate(value: string): NamedNode {
         return this.makeResourceIRI(value);
     }
 
@@ -215,28 +202,28 @@ export abstract class AbstractBNodeSerializer {
      * @param value
      * @param xsdDataType - a string or [[XSDDataType]] can be used
      */
-    protected makeLiteralWithDataType(value: any, xsdDataType: string): RDFLiteral {
+    protected makeLiteralWithDataType(value: any, xsdDataType: string): Literal {
         return this.makeLiteral(value, this.makeResourceIRI(xsdDataType));
     }
 
-    protected makeLangLiteral(value: string | number, lang: string): RDFLiteral {
+    protected makeLangLiteral(value: string | number, lang: string): Literal {
         return this.makeLiteral(value, lang);
     }
 
-    private makeLiteral(value: string | number, languageOrDatatype?: string | RDFResourceIRI): RDFLiteral {
-        return N3.DataFactory.literal(value, languageOrDatatype);
+    private makeLiteral(value: string | number, languageOrDatatype?: string | NamedNode): Literal {
+        return DataFactory.literal(value, languageOrDatatype);
     }
 
     /**
-     * Convenience method to create [[RDFResourceIRI]]
+     * Convenience method to create [[NamedNode]]
      * @param value
      */
-    protected makeResourceIRI(value: string): RDFResourceIRI {
-        return N3.DataFactory.namedNode(value);
+    protected makeResourceIRI(value: string): NamedNode {
+        return DataFactory.namedNode(value);
     }
 
-    protected makeBlankNode(value?: string): RDFBlankNode {
-        return N3.DataFactory.blankNode(value);
+    protected makeBlankNode(value?: string): BlankNode {
+        return DataFactory.blankNode(value);
     }
 
     /**
