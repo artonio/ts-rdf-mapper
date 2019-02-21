@@ -68,6 +68,9 @@ export class SerializerProcessor {
             }
 
             const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', target);
+            if (!ns && !beanType && !properties) {
+                throw new Error('No decorators found');
+            }
             if (properties) {
                 properties.forEach((p: IRdfPropertyMetadata) => {
                     // If clazz property is present then it is an Object

@@ -38,4 +38,21 @@ describe('Meaningful Exceptions should be thrown', () => {
             expect(e.message).toEqual('Key firstName cannot have both lang or xsdType present when isIRI is set to true inside the decorator');
         }
     });
+
+    it('Should throw Error if no decorators present', () => {
+        class NoDec {
+            index: number;
+            name: string;
+        }
+
+        const n: NoDec = new NoDec();
+        n.index = 0;
+        n.name = 'test';
+        try {
+            const r = RdfMapper.serialize(n);
+        } catch (e) {
+            expect(e instanceof Error).toBeTruthy();
+            expect(e.message).toEqual('No decorators found');
+        }
+    });
 });
