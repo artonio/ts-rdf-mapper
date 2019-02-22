@@ -11,6 +11,7 @@ module.exports = {
     ],
 
     mode: 'file',
+    ignoreCompilerErrors: true,
     excludeExternals: true,
     excludeNotExported: true,
     excludePrivate: true,
