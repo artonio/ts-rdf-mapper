@@ -14,7 +14,7 @@ import {
     MonthWithIRI,
     Per,
     PersonHasFriend,
-    PersonMultipleDataTypes,
+    PersonMultipleDataTypes, SampleTreeNode,
     SuperBase
 } from './models/models';
 import {Address} from './models/oneToOneModels';
@@ -43,9 +43,11 @@ const SERIALIZE_INTO_BLANK_NODE = 'Should serialize into a blank node';
 const SERIALIZE_INTO_BLANK_NODE_ISIRI = 'Serialize into blank node with isIRI';
 const SERIALIZE_JSON_USING_DYNAMIC_SERIALIZER = 'Serialize json with dynamic serializer';
 
+const SERIALIZE_RECURSIVE_TREE = 'Serialize recursive tree into blank nodes';
+
 const shouldLogResult = false;
 
-function logResult(assertName: string, result: any, logOnlyMe?: boolean) {
+function logResult(assertName: string, result: any, logOnlyMe = false) {
     if (shouldLogResult || logOnlyMe) {
         console.log(`Expectation: ${assertName}`);
         console.log(`Result:\n${result}`);
@@ -270,7 +272,7 @@ describe('Testing basic serialization functions', () => {
         const r = RdfMapper.serialize(month);
         expect(r).toContain(`month:monthWithIRIDays-uuid a foaf:Month;`);
         expect(r).toContain(`foaf:day <http://example.com/Mon>, <http://example.com/Tue>, <http://example.com/Wed>.`);
-        logResult(SERIALIZE_ARRAY_OF_IRIs, r, true);
+        logResult(SERIALIZE_ARRAY_OF_IRIs, r);
     });
 
     it(SERIALIZE_ARRAY_OF_OBJECTS, () => {
@@ -328,6 +330,31 @@ describe('Testing basic serialization functions', () => {
         u.address = {streetName: 'St Clair', streetNumber: 223, isRegistered: true};
         const r = RdfMapper.serialize(u);
         logResult(SERIALIZE_JSON_USING_DYNAMIC_SERIALIZER, r);
+    });
+
+    it(SERIALIZE_RECURSIVE_TREE, () => {
+        const topNode: SampleTreeNode = new SampleTreeNode();
+        topNode.index = 0;
+        topNode.label = 'Top Parent';
+
+        const subNodeOne: SampleTreeNode = new SampleTreeNode();
+        subNodeOne.index = 0;
+        subNodeOne.label = 'Sub Node 1';
+
+        const subNodeTwo: SampleTreeNode = new SampleTreeNode();
+        subNodeTwo.index = 1;
+        subNodeTwo.label = 'Sub Node 2';
+
+        const subNodeThree: SampleTreeNode = new SampleTreeNode();
+        subNodeThree.index = 2;
+        subNodeThree.label = 'Sub Node 3';
+
+        // topNode.children = [subNodeOne, subNodeTwo, subNodeThree];
+        topNode._children  = [subNodeOne, subNodeTwo, subNodeThree];
+
+        const r = RdfMapper.serialize(topNode);
+        const deserializedNode: SampleTreeNode = RdfMapper.deserialize(SampleTreeNode, r);
+        logResult(SERIALIZE_RECURSIVE_TREE, r, true);
     });
 
 });

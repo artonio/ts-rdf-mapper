@@ -181,6 +181,49 @@ export class MonthWithIRI {
     public days: string[];
 }
 
+@RdfPrefixes({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    treeNode: 'http://example.com/treeNode/'
+})
+@RdfBean('foaf:SampleTreeNode')
+export class SampleTreeNode {
+
+    @RdfProperty({predicate: 'foaf:hasNode', clazz: SampleTreeNode, isArray: true})
+    public children: SampleTreeNode[];
+
+    @RdfProperty({predicate: 'foaf:label', xsdType: XSDDataType.XSD_STRING})
+    public label: string;
+
+    @RdfProperty({predicate: 'foaf:hasNode', clazz: SampleTreeNode, isArray: true})
+    set _children(value: SampleTreeNode[]) {
+        value.sort((a, b) => {
+            return a.index - b.index;
+        });
+        this.children = value;
+    }
+
+    @RdfProperty({predicate: 'treeNode:gindex', xsdType: XSDDataType.XSD_INTEGER})
+    index: number;
+}
+
+export const sampleTreeNodeTTL = `
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix treeNode: <http://example.com/treeNode/>.
+
+_:n3-9 a foaf:SampleTreeNode;
+    foaf:label "Sub Node 1"^^xsd:string.
+_:n3-8 a foaf:SampleTreeNode;
+    foaf:hasNode _:n3-11, _:n3-9, _:n3-10;
+    foaf:label "Top Parent"^^xsd:string.
+_:n3-11 a foaf:SampleTreeNode;
+    treeNode:gindex "2"^^xsd:integer;
+    foaf:label "Sub Node 3"^^xsd:string.
+_:n3-10 foaf:label "Sub Node 2"^^xsd:string;
+    a foaf:SampleTreeNode;
+    treeNode:gindex "1"^^xsd:integer.
+`;
+
 export const invalidTTL = `
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
