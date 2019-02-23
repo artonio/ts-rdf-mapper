@@ -17,11 +17,16 @@ const SERIALIZE_BASIC_TYPES = 'Should serialize basic types';
 const SERIALIZE_BASIC_TYPES_CHANGE_VALUE = 'Should serialize basic types, change property values';
 const SERIALIZE_ONE_TO_ONE = 'Serialize one to one relationship';
 const SERIALIZE_PERSON_HAS_FRIEND = 'Serialize person has friend person';
+
 const SERIALIZE_ONE_TO_MANY = 'Serialize one to many relationship';
 const SERIALIZE_ONE_TO_MANY_AND_INVERSEOF = 'Serialize Recipe has many ingredients and inverseof';
+
 const SERIALIZE_BASIC_INHERITANCE = 'Serialize basic inheritance';
 const SERIALIZE_ENUMS = 'Serialize Enums';
+
+const SERIALIZE_ARRAY_OF_LITERALS = 'Should serialize array of litrals';
 const SERIALIZE_ARRAY_OF_OBJECTS = 'Serialize Array of objects';
+
 const SERIALIZE_LITERALS_CUSTOM_SERIALIZER = 'Serialize literal with customs serializer';
 const SERIALIZE_INTO_BLANK_NODE = 'Should serialize into a blank node';
 const SERIALIZE_INTO_BLANK_NODE_ISIRI = 'Serialize into blank node with isIRI';
@@ -232,6 +237,10 @@ describe('Testing basic serialization functions', () => {
         expect(r).toContain(`foaf:day "Mon"^^xsd:string.`);
 
         logResult(SERIALIZE_ENUMS, r);
+    });
+
+    it(SERIALIZE_ARRAY_OF_LITERALS, () => {
+
     });
 
     it(SERIALIZE_ARRAY_OF_OBJECTS, () => {
