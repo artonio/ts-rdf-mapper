@@ -13,8 +13,31 @@ import {RdfIngredient, RdfRecipe} from './models/recipesManyToMany';
 import {Recipe1, Video1} from './models/serializeIsIRI';
 import {UserJsonObject} from './models/serializeJsonObj';
 
+const SERIALIZE_BASIC_TYPES = 'Should serialize basic types';
+const SERIALIZE_BASIC_TYPES_CHANGE_VALUE = 'Should serialize basic types, change property values';
+const SERIALIZE_ONE_TO_ONE = 'Serialize one to one relationship';
+const SERIALIZE_PERSON_HAS_FRIEND = 'Serialize person has friend person';
+const SERIALIZE_ONE_TO_MANY = 'Serialize one to many relationship';
+const SERIALIZE_ONE_TO_MANY_AND_INVERSEOF = 'Serialize Recipe has many ingredients and inverseof';
+const SERIALIZE_BASIC_INHERITANCE = 'Serialize basic inheritance';
+const SERIALIZE_ENUMS = 'Serialize Enums';
+const SERIALIZE_ARRAY_OF_OBJECTS = 'Serialize Array of objects';
+const SERIALIZE_LITERALS_CUSTOM_SERIALIZER = 'Serialize literal with customs serializer';
+const SERIALIZE_INTO_BLANK_NODE = 'Should serialize into a blank node';
+const SERIALIZE_INTO_BLANK_NODE_ISIRI = 'Serialize into blank node with isIRI';
+const SERIALIZE_JSON_USING_DYNAMIC_SERIALIZER = 'Serialize json with dynamic serializer';
+
+const shouldLogResult = false;
+
+function logResult(assertName: string, result: any) {
+    if (shouldLogResult) {
+        console.log(`Expectation: ${assertName}`);
+        console.log(`Result:\n${result}`);
+    }
+}
+
 describe('Testing basic serialization functions', () => {
-    it('Should serialize basic types', () => {
+    it(SERIALIZE_BASIC_TYPES, () => {
         const p = new PersonMultipleDataTypes();
         p.uuid = '123345dfx';
         p.name = 'Anton';
@@ -35,11 +58,11 @@ describe('Testing basic serialization functions', () => {
         expect(b).toContain(`person:weight "95.5"^^xsd:double;`);
         expect(b).toContain(`person:height "198.5"^^xsd:long;`);
         expect(b).toContain(`person:buoyancy "53.2"^^xsd:float.`);
-        // console.log(b);
 
+        logResult(SERIALIZE_BASIC_TYPES, b);
     });
 
-    it('Should serialize basic, change properties', () => {
+    it(SERIALIZE_BASIC_TYPES_CHANGE_VALUE, () => {
         const p = new PersonMultipleDataTypes();
         p.gender = 'M';
         p.uuid = '123345dfx';
@@ -47,14 +70,15 @@ describe('Testing basic serialization functions', () => {
         p.name = 'Ant';
         p.name = 'John';
 
-        const b = RdfMapper.serialize(p);
-        expect(b).toContain(`person:123345dfx a foaf:Person;`);
-        expect(b).toContain(`person:name "John"`);
-        expect(b).toContain(`person:gender "M"^^xsd:string;`);
-        console.log(b);
+        const r = RdfMapper.serialize(p);
+        expect(r).toContain(`person:123345dfx a foaf:Person;`);
+        expect(r).toContain(`person:name "John"`);
+        expect(r).toContain(`person:gender "M"^^xsd:string;`);
+
+        logResult(SERIALIZE_BASIC_TYPES_CHANGE_VALUE, r);
     });
 
-    it('Serialize one to one relationship', () => {
+    it(SERIALIZE_ONE_TO_ONE, () => {
         @RdfPrefixes({
             foaf: 'http://xmlns.com/foaf/0.1/',
             person: 'http://example.com/Person/',
@@ -95,18 +119,17 @@ describe('Testing basic serialization functions', () => {
         p.name = 'John';
         p.address = a;
 
-        const b = RdfMapper.serialize(p);
-        expect(b).toContain(`person:person-uuid a foaf:Person;`);
-        expect(b).toContain(`person:name "John"^^xsd:string;`);
-        expect(b).toContain(`person:hasAddress address:address-uuid.`);
-        expect(b).toContain(`address:address-uuid a foaf:Address;`);
-        expect(b).toContain(`address:streetName "Jasmine"^^xsd:string.`);
+        const r = RdfMapper.serialize(p);
+        expect(r).toContain(`person:person-uuid a foaf:Person;`);
+        expect(r).toContain(`person:name "John"^^xsd:string;`);
+        expect(r).toContain(`person:hasAddress address:address-uuid.`);
+        expect(r).toContain(`address:address-uuid a foaf:Address;`);
+        expect(r).toContain(`address:streetName "Jasmine"^^xsd:string.`);
 
-        // console.log(b);
-
+        logResult(SERIALIZE_ONE_TO_ONE, r);
     });
 
-    it('Serialize person has friend person', () => {
+    it(SERIALIZE_PERSON_HAS_FRIEND, () => {
         const antonPerson: PersonHasFriend = new PersonHasFriend();
         antonPerson.uuid = 'Anton';
         antonPerson.name = 'Anton S';
@@ -123,11 +146,44 @@ describe('Testing basic serialization functions', () => {
         expect(r).toContain(`person:Anton a foaf:Person;`);
         expect(r).toContain(`foaf:name "Anton S"^^xsd:string;`);
         expect(r).toContain(`foaf:knows person:Oscar.`);
-        console.log(r);
+
+        logResult(SERIALIZE_PERSON_HAS_FRIEND, r);
+    });
+
+    it(SERIALIZE_ONE_TO_MANY, () => {
+        const a1 = new Addr();
+        a1.uuid = 'uuid1';
+        a1.houseNum = 10;
+        a1.streetName = 'Jasmine';
+
+        const a2 = new Addr();
+        a2.uuid = 'uuid2';
+        a2.houseNum = 223;
+        a2.streetName = 'Joseph';
+
+        const p = new Per();
+        p.uuid = 'person-uuid';
+        p.addresses = [a1, a2];
+
+        const r = RdfMapper.serialize(p);
+        // console.log(b);
+        expect(r).toContain(`person:person-uuid a foaf:Person;`);
+        expect(r).toContain(`address:uuid2 a foaf:Address;`);
+        expect(r).toContain(`address:uuid1 a foaf:Address;`);
+
+        expect(r).toContain(`person:hasAddress address:uuid1, address:uuid2.`);
+
+        expect(r).toContain(`address:houseNum "223"^^xsd:string`);
+        expect(r).toContain(`address:streetName "Joseph"^^xsd:string`);
+
+        expect(r).toContain(`address:houseNum "223"^^xsd:string`);
+        expect(r).toContain(`address:streetName "Jasmine"^^xsd:string`);
+
+        logResult(SERIALIZE_ONE_TO_MANY, r);
 
     });
 
-    it('Serialize Recipe has many ingredients and inverseof', () => {
+    it(SERIALIZE_ONE_TO_MANY_AND_INVERSEOF, () => {
         const recipe: RdfRecipe = new RdfRecipe();
         recipe.recipeIdentifier = 'Lasagna';
         recipe.recipeName = 'Lasagna';
@@ -147,41 +203,11 @@ describe('Testing basic serialization functions', () => {
         recipe.ingredients = [beefIngredient, spaghettiSauce];
 
         const r = RdfMapper.serialize(recipe);
-        console.log(r);
+
+        logResult(SERIALIZE_ONE_TO_MANY_AND_INVERSEOF, r);
     });
 
-    it('Serialize one to many relationship', () => {
-        const a1 = new Addr();
-        a1.uuid = 'uuid1';
-        a1.houseNum = 10;
-        a1.streetName = 'Jasmine';
-
-        const a2 = new Addr();
-        a2.uuid = 'uuid2';
-        a2.houseNum = 223;
-        a2.streetName = 'Joseph';
-
-        const p = new Per();
-        p.uuid = 'person-uuid';
-        p.addresses = [a1, a2];
-
-        const b = RdfMapper.serialize(p);
-        // console.log(b);
-        expect(b).toContain(`person:person-uuid a foaf:Person;`);
-        expect(b).toContain(`address:uuid2 a foaf:Address;`);
-        expect(b).toContain(`address:uuid1 a foaf:Address;`);
-
-        expect(b).toContain(`person:hasAddress address:uuid1, address:uuid2.`);
-
-        expect(b).toContain(`address:houseNum "223"^^xsd:string`);
-        expect(b).toContain(`address:streetName "Joseph"^^xsd:string`);
-
-        expect(b).toContain(`address:houseNum "223"^^xsd:string`);
-        expect(b).toContain(`address:streetName "Jasmine"^^xsd:string`);
-
-    });
-
-    it('Serialize basic inheritance', () => {
+    it(SERIALIZE_BASIC_INHERITANCE, () => {
         const sb = new SuperBase();
         sb.uuid = 'inheritance-uuid';
         sb.baseProp = 'baseValue';
@@ -191,22 +217,24 @@ describe('Testing basic serialization functions', () => {
         expect(r).toContain(`foaf:inheritance-uuid a foaf:SuperBase;`);
         expect(r).toContain(`foaf:baseProp "baseValue"^^xsd:string;`);
         expect(r).toContain(`foaf:extendedProp "extendedValue"^^xsd:string.`);
-        // console.log(r);
+
+        logResult(SERIALIZE_BASIC_INHERITANCE, r);
     });
 
-    it('Serialize Enums', () => {
-       const cal = new Calendar();
-       cal.uuid = 'cal-uuid';
-       cal.day = Days.Mon;
+    it(SERIALIZE_ENUMS, () => {
+        const cal = new Calendar();
+        cal.uuid = 'cal-uuid';
+        cal.day = Days.Mon;
 
         const r = RdfMapper.serialize(cal);
-        // console.log(r);
 
         expect(r).toContain(`calendar:cal-uuid a foaf:Calendar;`);
         expect(r).toContain(`foaf:day "Mon"^^xsd:string.`);
+
+        logResult(SERIALIZE_ENUMS, r);
     });
 
-    it('Serialize Array', () => {
+    it(SERIALIZE_ARRAY_OF_OBJECTS, () => {
         const addr1: Address = new Address();
         addr1.uuid = 'addr1-uuid';
         addr1.streetName = 'Zigg';
@@ -220,20 +248,21 @@ describe('Testing basic serialization functions', () => {
         expect(r).toContain(`address:streetName "St Clair"^^xsd:string.`);
         expect(r).toContain(`address:addr1-uuid a foaf:Address;`);
         expect(r).toContain(`address:streetName "Zigg"^^xsd:string.`);
-        // console.log(r);
+
+        logResult(SERIALIZE_ARRAY_OF_OBJECTS, r);
     });
 
-    it('Serialize literal with customs serializer', () => {
+    it(SERIALIZE_LITERALS_CUSTOM_SERIALIZER, () => {
         const u: User = new User();
         u.uuid = 'anton';
         u.regDate = new Date().getTime();
         u.birthDate = new Date('1995-12-17T03:24:00');
 
         const r = RdfMapper.serialize(u);
-        console.log(r);
+        logResult(SERIALIZE_LITERALS_CUSTOM_SERIALIZER, r);
     });
 
-    it('Should serialize into a blank node', () => {
+    it(SERIALIZE_INTO_BLANK_NODE, () => {
         const recipe: Recipe = new Recipe();
         recipe.recipeName = 'Cheesecake';
 
@@ -241,25 +270,25 @@ describe('Testing basic serialization functions', () => {
         video.name = 'Japanese Cheesecake instructions';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
-        console.log(r);
+        logResult(SERIALIZE_INTO_BLANK_NODE, r);
     });
 
-    it('Serialize into blank node with isIRI', () => {
+    it(SERIALIZE_INTO_BLANK_NODE_ISIRI, () => {
         const recipe: Recipe1 = new Recipe1();
         recipe.recipeName = 'Cheesecake';
         const video: Video1 = new Video1();
         video.url = 'http://example.com/Video1';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
-        console.log(r);
+        logResult(SERIALIZE_INTO_BLANK_NODE_ISIRI, r);
     });
 
-    it('Serialize json with dynamic serializer', () => {
+    it(SERIALIZE_JSON_USING_DYNAMIC_SERIALIZER, () => {
         const u: UserJsonObject = new UserJsonObject();
         u.name = 'Anton';
         u.address = {streetName: 'St Clair', streetNumber: 223, isRegistered: true};
         const r = RdfMapper.serialize(u);
-        console.log(r);
+        logResult(SERIALIZE_JSON_USING_DYNAMIC_SERIALIZER, r);
     });
 
 });

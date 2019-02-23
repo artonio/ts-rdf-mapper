@@ -4,6 +4,15 @@ import {RdfMapper} from '../main/RdfMapper';
 import {invalidTTL, Person} from './models/models';
 import {PersonTypeAndIsIRI, PersonTypeAndLang} from './models/wrongfullyAnnotatedModel';
 
+const shouldLogResult = false;
+
+function logResult(assertName: string, result: any) {
+    if (shouldLogResult) {
+        console.log(`Expectation: ${assertName}`);
+        console.log(`Result:\n${result}`);
+    }
+}
+
 describe('Meaningful Exceptions should be thrown', () => {
     it('Should throw TurtleParseError when turtle is invalid', async (done) => {
         try {
