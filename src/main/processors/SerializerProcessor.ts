@@ -45,7 +45,7 @@ export class SerializerProcessor {
     public serialize<T>(target: T | T[]): string {
         this.process(target);
         this.sortQuads(this.quadsArr);
-        this.n3Writer = Writer({prefixes: this.prefixes});
+        this.n3Writer = new Writer({prefixes: this.prefixes});
         // this.n3Writer.addPrefixes(this.prefixes);
         this.n3Writer.addQuads(this.quadsArr);
         return this.getTTLString();
@@ -110,7 +110,7 @@ export class SerializerProcessor {
                     }
 
                     // If value is set for the current key, process it
-                    if (p.val) {
+                    if (p.val || p.val === 0) {
                         // If this is an Object, clazz annotated
                         if (propertyClassType) {
                             this.processClazzAnnotatedPropertyValue(p.val, subject, predicate, xsdDataType, inversedPredicate, serializer);

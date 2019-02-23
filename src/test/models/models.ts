@@ -189,12 +189,12 @@ export class MonthWithIRI {
 export class SampleTreeNode {
 
     @RdfProperty({predicate: 'foaf:hasNode', clazz: SampleTreeNode, isArray: true})
-    public children: SampleTreeNode[];
+    children: SampleTreeNode[];
 
     @RdfProperty({predicate: 'foaf:label', xsdType: XSDDataType.XSD_STRING})
-    public label: string;
+    label: string;
 
-    @RdfProperty({predicate: 'foaf:hasNode', clazz: SampleTreeNode, isArray: true})
+    // @RdfProperty({predicate: 'foaf:hasNode', clazz: SampleTreeNode, isArray: true})
     set _children(value: SampleTreeNode[]) {
         value.sort((a, b) => {
             return a.index - b.index;
@@ -202,7 +202,7 @@ export class SampleTreeNode {
         this.children = value;
     }
 
-    @RdfProperty({predicate: 'treeNode:gindex', xsdType: XSDDataType.XSD_INTEGER})
+    @RdfProperty({predicate: 'treeNode:gindex', xsdType: XSDDataType.XSD_INT})
     index: number;
 }
 
