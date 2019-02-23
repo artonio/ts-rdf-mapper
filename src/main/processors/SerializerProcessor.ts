@@ -139,14 +139,15 @@ export class SerializerProcessor {
         }
     }
 
-    private processArrayOfPrimitiveValues(value: any[], subject: Quad_Subject, predicate: Quad_Predicate, xsdDataType: NamedNode, serializer?: any): void {}
-
     private processPrimitiveValue(value: any, subject: Quad_Subject, predicate: Quad_Predicate, xsdDataType: NamedNode, lang: string, isIRI: boolean, serializer?: any): void {
         if (serializer) {
             this.processPrimiteValueWithAnnotatedSerializer(value, subject, predicate, xsdDataType, lang, serializer);
         } else {
             if (value instanceof Date) {
                 this.processValueOfDateTypeWithDefaultSerializer(value, subject, predicate, xsdDataType);
+            }
+            else if (Array.isArray(value)) {
+                this.processArrayOfPrimitiveValues(value, subject, predicate, xsdDataType, lang, isIRI);
             }
             else if (isIRI) {
                 const objectResource: NamedNode = DataFactory.namedNode(value);
@@ -234,6 +235,26 @@ export class SerializerProcessor {
             } else {
                 const resultObject: Quad_Subject = this.process(prop);
                 const q = this.createQuad(subject, predicate, resultObject);
+                this.quadsArr.push(q);
+            }
+        });
+    }
+
+    private processArrayOfPrimitiveValues(values: any[], subject: Quad_Subject, predicate: Quad_Predicate, xsdDataType: NamedNode, lang: string, isIRI: boolean, serializer?: any): void {
+        values.forEach((val: any) => {
+            let objectLiteral: Literal;
+            if (isIRI) {
+                const objectResource: NamedNode = DataFactory.namedNode(val);
+                const q = this.createQuad(subject, predicate, objectResource);
+                this.quadsArr.push(q);
+            } else {
+                if (xsdDataType) {
+                    objectLiteral = this.makeLiteral(val, xsdDataType);
+                }
+                if (lang) {
+                    objectLiteral = this.makeLiteral(val, lang);
+                }
+                const q = this.createQuad(subject, predicate, objectLiteral);
                 this.quadsArr.push(q);
             }
         });

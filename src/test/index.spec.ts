@@ -6,7 +6,17 @@ import {RdfSubject} from '../main/annotations/RdfSubject';
 import {XSDDataType} from '../main/annotations/XSDDataType';
 import {RdfMapper} from '../main/RdfMapper';
 import {User} from './models/litralSerializer';
-import {Addr, Calendar, Days, Per, PersonHasFriend, PersonMultipleDataTypes, SuperBase} from './models/models';
+import {
+    Addr,
+    Calendar,
+    Days,
+    Month,
+    MonthWithIRI,
+    Per,
+    PersonHasFriend,
+    PersonMultipleDataTypes,
+    SuperBase
+} from './models/models';
 import {Address} from './models/oneToOneModels';
 import {Recipe, Video} from './models/recipes';
 import {RdfIngredient, RdfRecipe} from './models/recipesManyToMany';
@@ -24,7 +34,8 @@ const SERIALIZE_ONE_TO_MANY_AND_INVERSEOF = 'Serialize Recipe has many ingredien
 const SERIALIZE_BASIC_INHERITANCE = 'Serialize basic inheritance';
 const SERIALIZE_ENUMS = 'Serialize Enums';
 
-const SERIALIZE_ARRAY_OF_LITERALS = 'Should serialize array of litrals';
+const SERIALIZE_ARRAY_OF_LITERALS = 'Should serialize array of literals';
+const SERIALIZE_ARRAY_OF_IRIs = 'Should serialize array of IRIs';
 const SERIALIZE_ARRAY_OF_OBJECTS = 'Serialize Array of objects';
 
 const SERIALIZE_LITERALS_CUSTOM_SERIALIZER = 'Serialize literal with customs serializer';
@@ -34,8 +45,8 @@ const SERIALIZE_JSON_USING_DYNAMIC_SERIALIZER = 'Serialize json with dynamic ser
 
 const shouldLogResult = false;
 
-function logResult(assertName: string, result: any) {
-    if (shouldLogResult) {
+function logResult(assertName: string, result: any, logOnlyMe?: boolean) {
+    if (shouldLogResult || logOnlyMe) {
         console.log(`Expectation: ${assertName}`);
         console.log(`Result:\n${result}`);
     }
@@ -240,7 +251,26 @@ describe('Testing basic serialization functions', () => {
     });
 
     it(SERIALIZE_ARRAY_OF_LITERALS, () => {
+        const month: Month = new Month();
+        month.uuid = 'month-uuid';
+        month.days = ['Mon', 'Tue', 'Wed'];
 
+        const r = RdfMapper.serialize(month);
+        expect(r).toContain(`month:month-uuid a foaf:Month;`);
+        expect(r).toContain(`foaf:day "Mon"^^xsd:string, "Tue"^^xsd:string, "Wed"^^xsd:string.`);
+
+        logResult(SERIALIZE_ARRAY_OF_LITERALS, r);
+    });
+
+    it(SERIALIZE_ARRAY_OF_IRIs, () => {
+       const month: MonthWithIRI = new MonthWithIRI();
+        month.uuid = 'monthWithIRIDays-uuid';
+        month.days = ['http://example.com/Mon', 'http://example.com/Tue', 'http://example.com/Wed'];
+
+        const r = RdfMapper.serialize(month);
+        expect(r).toContain(`month:monthWithIRIDays-uuid a foaf:Month;`);
+        expect(r).toContain(`foaf:day <http://example.com/Mon>, <http://example.com/Tue>, <http://example.com/Wed>.`);
+        logResult(SERIALIZE_ARRAY_OF_IRIs, r, true);
     });
 
     it(SERIALIZE_ARRAY_OF_OBJECTS, () => {

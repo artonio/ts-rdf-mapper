@@ -155,6 +155,32 @@ export class Calendar {
 
 }
 
+@RdfPrefixes({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    month: 'http://example.com/Month/'
+})
+@RdfBean('foaf:Month')
+export class Month {
+    @RdfSubject('month')
+    public uuid: string;
+
+    @RdfProperty({predicate: 'foaf:day', xsdType: XSDDataType.XSD_STRING})
+    public days: string[];
+}
+
+@RdfPrefixes({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    month: 'http://example.com/Month/'
+})
+@RdfBean('foaf:Month')
+export class MonthWithIRI {
+    @RdfSubject('month')
+    public uuid: string;
+
+    @RdfProperty({predicate: 'foaf:day', isIRI: true})
+    public days: string[];
+}
+
 export const invalidTTL = `
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .

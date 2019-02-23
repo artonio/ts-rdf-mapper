@@ -1,7 +1,7 @@
 import {RdfMapper} from '../main/RdfMapper';
 import {PersonNonPrefixed} from './models/nonPrefixModels';
 
-const shouldLogResult = true;
+const shouldLogResult = false;
 
 const SERIALIZE_BASIC_TYPES = 'Should serialize basic types (no prefixes)';
 
