@@ -181,14 +181,20 @@ export class MonthWithIRI {
     public days: string[];
 }
 
+export abstract class RDFTreeInterface {
+
+    @RdfProperty({predicate: 'http://ts-rdf-mapper.com#isRootNode', xsdType: XSDDataType.XSD_BOOLEAN})
+    isRoot = false;
+}
+
 @RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     treeNode: 'http://example.com/treeNode/'
 })
 @RdfBean('foaf:SampleTreeNode')
-export class SampleTreeNode {
+export class SampleTreeNode extends RDFTreeInterface {
 
-    @RdfProperty({predicate: 'foaf:hasNode', clazz: SampleTreeNode, isArray: true})
+    @RdfProperty({predicate: 'foaf:children', clazz: SampleTreeNode, isArray: true})
     children: SampleTreeNode[];
 
     @RdfProperty({predicate: 'foaf:label', xsdType: XSDDataType.XSD_STRING})
@@ -201,9 +207,9 @@ export class SampleTreeNode {
         });
         this.children = value;
     }
-
     @RdfProperty({predicate: 'treeNode:gindex', xsdType: XSDDataType.XSD_INT})
     index: number;
+
 }
 
 export const sampleTreeNodeTTL = `

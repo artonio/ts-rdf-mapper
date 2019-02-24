@@ -110,7 +110,7 @@ export class SerializerProcessor {
                     }
 
                     // If value is set for the current key, process it
-                    if (p.val || p.val === 0) {
+                    if (p.val !== undefined) {
                         // If this is an Object, clazz annotated
                         if (propertyClassType) {
                             this.processClazzAnnotatedPropertyValue(p.val, subject, predicate, xsdDataType, inversedPredicate, serializer);
@@ -317,7 +317,7 @@ export class SerializerProcessor {
             r[key] = DataFactory.namedNode(ns[key]);
         });
 
-        // r['xsd'] = N3.DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#');
+        r['tsRdfMapper'] = DataFactory.namedNode('http://ts-rdf-mapper.com#');
         return r;
     }
 

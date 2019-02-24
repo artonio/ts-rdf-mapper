@@ -27,4 +27,9 @@ export class RdfMapper {
         return deserializeProcessor.deserialize(type, ttlData);
     }
 
+    public static deserializeTree<T>(type: { new(): T }, ttlData: string): T {
+        const deserializeProcessor: DeserializerProcessor = new DeserializerProcessor();
+        return deserializeProcessor.deserializeTree(type, ttlData);
+    }
+
 }

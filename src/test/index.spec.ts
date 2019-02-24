@@ -334,6 +334,7 @@ describe('Testing basic serialization functions', () => {
 
     it(SERIALIZE_RECURSIVE_TREE, () => {
         const topNode: SampleTreeNode = new SampleTreeNode();
+        topNode.isRoot = true;
         topNode.index = 0;
         topNode.label = 'Top Parent';
 
@@ -345,15 +346,15 @@ describe('Testing basic serialization functions', () => {
         subNodeTwo.index = 1;
         subNodeTwo.label = 'Sub Node 2';
 
-        const subNodeThree: SampleTreeNode = new SampleTreeNode();
-        subNodeThree.index = 2;
-        subNodeThree.label = 'Sub Node 3';
+        // const subNodeThree: SampleTreeNode = new SampleTreeNode();
+        // subNodeThree.index = 2;
+        // subNodeThree.label = 'Sub Node 3';
 
         // topNode.children = [subNodeOne, subNodeTwo, subNodeThree];
-        topNode._children  = [subNodeOne, subNodeTwo, subNodeThree];
+        topNode._children  = [subNodeOne, subNodeTwo];
 
         const r = RdfMapper.serialize(topNode);
-        const deserializedNode: SampleTreeNode = RdfMapper.deserialize(SampleTreeNode, r);
+        const deserializedNode: SampleTreeNode = RdfMapper.deserializeTree(SampleTreeNode, r);
         logResult(SERIALIZE_RECURSIVE_TREE, r, true);
     });
 
