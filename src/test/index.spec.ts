@@ -315,10 +315,9 @@ describe('Testing basic serialization functions', () => {
         video.name = 'Japanese Cheesecake instructions';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
-        expect(r).toContain(`_:n3-4 schema:name "Japanese Cheesecake instructions"^^xsd:string.`);
-        expect(r).toContain(`_:n3-3 a schema:Recipe;`);
+        expect(r).toContain(`schema:name "Japanese Cheesecake instructions"^^xsd:string.`);
+        expect(r).toContain(`a schema:Recipe;`);
         expect(r).toContain(`schema:recipeName "Cheesecake"^^xsd:string;`);
-        expect(r).toContain(`schema:video _:n3-4.`);
         logResult(SERIALIZE_INTO_BLANK_NODE, r);
     });
 
@@ -329,10 +328,10 @@ describe('Testing basic serialization functions', () => {
         video.url = 'http://example.com/Video1';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
-        expect(r).toContain(`_:n3-6 schema:videoURL <http://example.com/Video1>.`);
-        expect(r).toContain(`_:n3-5 a schema:Recipe;`);
+        expect(r).toContain(`schema:videoURL <http://example.com/Video1>.`);
+        expect(r).toContain(`a schema:Recipe;`);
         expect(r).toContain(`schema:recipeName "Cheesecake"^^xsd:string;`);
-        expect(r).toContain(`schema:video _:n3-6.`);
+        expect(r).toContain(`schema:video`);
         logResult(SERIALIZE_INTO_BLANK_NODE_ISIRI, r);
     });
 
@@ -342,8 +341,8 @@ describe('Testing basic serialization functions', () => {
         u.address = {streetName: 'St Clair', streetNumber: 223, isRegistered: true};
         const r = RdfMapper.serialize(u);
         expect(r).toContain(`user:Anton a foaf:User;`);
-        expect(r).toContain(`user:address _:n3-7.`);
-        expect(r).toContain(`_:n3-7 a address:1234;`);
+        expect(r).toContain(`user:address`);
+        expect(r).toContain(`a address:1234;`);
         expect(r).toContain(`address:streetName "St Clair"^^xsd:string;`);
         expect(r).toContain(`address:streetNumber "223"^^xsd:integer;`);
         expect(r).toContain(`address:isRegistered "true"^^xsd:boolean.`);
@@ -388,7 +387,7 @@ describe('Testing basic serialization functions', () => {
         expect(deserializedNode.children[2].label).toEqual('Sub Node 3');
         expect(deserializedNode.children[2].children.length).toBe(1);
         expect(deserializedNode.children[2].children[0].label).toEqual('Sub Node 3.1');
-        logResult(SERIALIZE_DESERIALIZE_RECURSIVE_TREE, r, true);
+        logResult(SERIALIZE_DESERIALIZE_RECURSIVE_TREE, r);
     });
 
 });

@@ -4,6 +4,15 @@ import {oneToOneRelationship, PersonHasAddress} from './models/oneToOneModels';
 import {Recipe, Video} from './models/recipes';
 import {QaTemplate, QaTemplateElement, templateTTL} from './models/templateModels';
 
+const shouldLogResult = false;
+
+function logResult(assertName: string, result: any, logOnlyMe = false) {
+    if (shouldLogResult || logOnlyMe) {
+        console.log(`Expectation: ${assertName}`);
+        console.log(`Result:\n${result}`);
+    }
+}
+
 describe('Test TTL Deserialization', () => {
     it('Deserialize basic ttl (async)', async (done) => {
         const instance: Person = await RdfMapper.deserializeAsync(Person, personTTL);
@@ -89,5 +98,7 @@ describe('Test TTL Deserialization', () => {
         expect(template.patientInformation.elements[0].index).toEqual(0);
         expect(template.patientInformation.elements[0].label).toEqual('Demographics');
         expect(template.patientInformation.elements[0].tag).toEqual('demographics');
+        const r = RdfMapper.serialize(template);
+        logResult('Deserialize and re-serialize recursive template', r, true);
     });
 });

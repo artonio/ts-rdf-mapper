@@ -39,6 +39,7 @@ export class QaTemplateElement {
     @RdfProperty({predicate: 'dswaSubElementProperty:diseaseSite', xsdType: XSDDataType.XSD_STRING})
     diseaseSite: string;
 
+    @RdfProperty({predicate: 'dswaSubElementProperty:', clazz: QaTemplateElement, isArray: true})
     elements: QaTemplateElement[];
 
     @RdfProperty({predicate: 'dswaSubElementProperty:', clazz: QaTemplateElement, isArray: true})
