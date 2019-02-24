@@ -1,26 +1,35 @@
-import * as N3 from 'n3';
-import * as RDF from 'rdf-js';
+import {
+    BlankNode,
+    DataFactory,
+    Literal,
+    NamedNode,
+    Prefixes,
+    Triple
+} from 'n3';
+/**
+ * Convenience alias type for Triple from 'n3'
+ */
+export type RDFTriple = Triple;
+/**
+ * Convenience alias type for Literal from 'n3'
+ */
+export type RDFLiteral = Literal;
+/**
+ * Convenience alias type for NamedNode from 'n3'
+ */
+export type RDFResourceIRI = NamedNode;
+/**
+ * Convenience alias type for BlankNode from 'n3'
+ */
+export type RDFBlankNode = BlankNode;
 
-/**
- * Convenience alias type for RDF.Quad from 'rdf-js'
- *
- * It is aliased as triple because we do not need to use the forth argument of N3.js library
- * when serializing data classes to turtle
- *
- */
-export type RDFTriple = RDF.Quad;
-/**
- * Convenience alias type for RDF.Literal from 'rdf-js'
- */
-export type RDFLiteral = RDF.Literal;
-/**
- * Convenience alias type for RDF.NamedNode from 'rdf-js'
- */
-export type RDFResourceIRI = RDF.NamedNode;
-/**
- * Convenience alias type for RDF.BlankNode from 'rdf-js'
- */
-export type RDFBlankNode = RDF.BlankNode;
+export type Triple_Subject = RDFResourceIRI | RDFBlankNode;
+
+export type Triple_Predicate = RDFResourceIRI;
+
+export type Triple_Object = RDFResourceIRI | RDFLiteral | RDFBlankNode;
+
+export interface RDFPrefixes extends Prefixes {}
 
 /**
  * This class can be extended whenever you may want to serialize a value that is a json object
@@ -111,7 +120,7 @@ export abstract class AbstractBNodeSerializer {
      *
      * more prefixes can be added by calling *this.addPrefix(prefix: string, iri: string)*
      */
-    protected prefixes: N3.Prefixes;
+    protected prefixes: RDFPrefixes;
     /**
      * Blank node is created when a developer extends this class. Identifies the *subject* in triple
      *
@@ -129,7 +138,7 @@ export abstract class AbstractBNodeSerializer {
      * Used to create a triple with a resource identifier
      * i.e ?subject a ?object
      */
-    protected readonly xsdType: RDFResourceIRI = N3.DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+    protected readonly xsdType: RDFResourceIRI = DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
     /**
      * @hidden
      */
@@ -190,12 +199,12 @@ export abstract class AbstractBNodeSerializer {
     /**
      * Create a triple by providing subject predicate object
      *
-     * @param subject - must be of type [[RDFResourceIRI]] or [[RDFBlankNode]]
-     * @param predicate - must be of type [[RDFResourceIRI]]
-     * @param object - must be of type [[RDFResourceIRI]] or [[RDFBlankNode]] or [[RDFLiteral]]
+     * @param subject - must be of type [[Triple_Subject]]
+     * @param predicate - must be of type [[Triple_Predicate]]
+     * @param object - must be of type [[Triple_Object]]
      */
-    protected createTriple(subject: RDF.Term, predicate: RDF.Term, object: RDF.Term): RDFTriple {
-        return N3.DataFactory.quad(
+    protected createTriple(subject: Triple_Subject, predicate: Triple_Predicate, object: Triple_Object): RDFTriple {
+        return DataFactory.quad(
             subject,
             predicate,
             object
@@ -224,7 +233,7 @@ export abstract class AbstractBNodeSerializer {
     }
 
     private makeLiteral(value: string | number, languageOrDatatype?: string | RDFResourceIRI): RDFLiteral {
-        return N3.DataFactory.literal(value, languageOrDatatype);
+        return DataFactory.literal(value, languageOrDatatype);
     }
 
     /**
@@ -232,11 +241,11 @@ export abstract class AbstractBNodeSerializer {
      * @param value
      */
     protected makeResourceIRI(value: string): RDFResourceIRI {
-        return N3.DataFactory.namedNode(value);
+        return DataFactory.namedNode(value);
     }
 
     protected makeBlankNode(value?: string): RDFBlankNode {
-        return N3.DataFactory.blankNode(value);
+        return DataFactory.blankNode(value);
     }
 
     /**

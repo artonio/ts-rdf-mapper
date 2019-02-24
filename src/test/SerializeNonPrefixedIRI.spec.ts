@@ -1,8 +1,19 @@
 import {RdfMapper} from '../main/RdfMapper';
 import {PersonNonPrefixed} from './models/nonPrefixModels';
 
+const shouldLogResult = false;
+
+const SERIALIZE_BASIC_TYPES = 'Should serialize basic types (no prefixes)';
+
+function logResult(assertName: string, result: any) {
+    if (shouldLogResult) {
+        console.log(`Expectation: ${assertName}`);
+        console.log(`Result:\n${result}`);
+    }
+}
+
 describe('Serialize without using prefixes', () => {
-    it('Should Serialize basic types', () => {
+    it(SERIALIZE_BASIC_TYPES, () => {
         const p = new PersonNonPrefixed();
         p.uuid = 'Anton';
         p.name = 'Anton';
@@ -23,7 +34,6 @@ describe('Serialize without using prefixes', () => {
         expect(b).toContain(`<http://example.com/Person/weight> "95.5"^^xsd:double;`);
         expect(b).toContain(`<http://example.com/Person/height> "198.5"^^xsd:long;`);
         expect(b).toContain(`<http://example.com/Person/buoyancy> "53.2"^^xsd:float.`);
-        console.log('Serialize without using prefixes');
-        // console.log(b);
+        logResult(SERIALIZE_BASIC_TYPES, b);
     });
 });

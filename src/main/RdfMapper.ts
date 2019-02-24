@@ -17,9 +17,19 @@ export class RdfMapper {
      * @param type
      * @param ttlData
      */
-    public static async deserialize<T>(type: { new(): T }, ttlData: string): Promise<T> {
+    public static async deserializeAsync<T>(type: { new(): T }, ttlData: string): Promise<T> {
+        const deserializeProcessor: DeserializerProcessor = new DeserializerProcessor();
+        return deserializeProcessor.deserializeAsync(type, ttlData);
+    }
+
+    public static deserialize<T>(type: { new(): T }, ttlData: string): T {
         const deserializeProcessor: DeserializerProcessor = new DeserializerProcessor();
         return deserializeProcessor.deserialize(type, ttlData);
+    }
+
+    public static deserializeTree<T>(type: { new(): T }, ttlData: string): T {
+        const deserializeProcessor: DeserializerProcessor = new DeserializerProcessor();
+        return deserializeProcessor.deserializeTree(type, ttlData);
     }
 
 }

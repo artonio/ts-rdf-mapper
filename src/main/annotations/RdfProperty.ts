@@ -18,7 +18,7 @@ const makeRDFPropertyMapper = <T>(prototype: any, key: string, prop: any) => {
                 set(value: any) {
                     values.set(this, value);
                     const s: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty', this) || [];
-                    if (value) {
+                    if (value !== undefined) {
                         if (s.length > 0) {
                             const existingValueIndex = s.findIndex((v: IRdfPropertyMetadata) => {
                                 return v.key === key;

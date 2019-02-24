@@ -1,8 +1,6 @@
+import {Literal, NamedNode, Triple} from 'n3';
 import {
-    AbstractBNodeSerializer,
-    RDFLiteral,
-    RDFResourceIRI,
-    RDFTriple
+    AbstractBNodeSerializer
 } from '../../main/annotations/interfaces/AbstractBNodeSerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
 import {RdfPrefixes} from '../../main/annotations/RdfPrefixes';
@@ -22,14 +20,14 @@ export class AddressSerializer extends AbstractBNodeSerializer {
         this.addPrefix('address', 'http://example.com/Address/');
     }
 
-    serialize(value: Object): RDFTriple[] {
-        const triples: RDFTriple[] = [];
+    serialize(value: Object): Triple[] {
+        const triples: Triple[] = [];
 
         triples.push(this.createTriple(this.subject, this.xsdType, this.makeResourceIRI('address:1234')));
 
         Object.keys(value).forEach(key => {
-            const predicate: RDFResourceIRI = this.makePredicate(`address:${key}`);
-            let obj: RDFLiteral;
+            const predicate: NamedNode = this.makePredicate(`address:${key}`);
+            let obj: Literal;
             // if value is a string
             if (typeof (value[key]) === 'string') {
                 obj = this.makeLiteralWithDataType(value[key], 'xsd:string');
