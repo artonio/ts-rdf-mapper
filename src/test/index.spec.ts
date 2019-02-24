@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import {AbstractTreeNode} from '../main/annotations/interfaces/AbstractTreeNode';
 import {RdfBean} from '../main/annotations/RdfBean';
 import {RdfPrefixes} from '../main/annotations/RdfPrefixes';
 import {RdfProperty} from '../main/annotations/RdfProperty';
@@ -43,7 +44,7 @@ const SERIALIZE_INTO_BLANK_NODE = 'Should serialize into a blank node';
 const SERIALIZE_INTO_BLANK_NODE_ISIRI = 'Serialize into blank node with isIRI';
 const SERIALIZE_JSON_USING_DYNAMIC_SERIALIZER = 'Serialize json with dynamic serializer';
 
-const SERIALIZE_RECURSIVE_TREE = 'Serialize recursive tree into blank nodes';
+const SERIALIZE_DESERIALIZE_RECURSIVE_TREE = 'Serialize recursive tree into blank nodes';
 
 const shouldLogResult = false;
 
@@ -300,6 +301,9 @@ describe('Testing basic serialization functions', () => {
         u.birthDate = new Date('1995-12-17T03:24:00');
 
         const r = RdfMapper.serialize(u);
+        expect(r).toContain(`user:anton a foaf:User;`);
+        expect(r).toContain(`user:birthday "1995-12-17T08:24:00.000Z"^^xsd:dateTime.`);
+        expect(r).toContain(`user:registrationDate "${new Date(u.regDate).toISOString()}"^^xsd:dateTime;`);
         logResult(SERIALIZE_LITERALS_CUSTOM_SERIALIZER, r);
     });
 
@@ -311,6 +315,10 @@ describe('Testing basic serialization functions', () => {
         video.name = 'Japanese Cheesecake instructions';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
+        expect(r).toContain(`_:n3-4 schema:name "Japanese Cheesecake instructions"^^xsd:string.`);
+        expect(r).toContain(`_:n3-3 a schema:Recipe;`);
+        expect(r).toContain(`schema:recipeName "Cheesecake"^^xsd:string;`);
+        expect(r).toContain(`schema:video _:n3-4.`);
         logResult(SERIALIZE_INTO_BLANK_NODE, r);
     });
 
@@ -321,6 +329,10 @@ describe('Testing basic serialization functions', () => {
         video.url = 'http://example.com/Video1';
         recipe.video = video;
         const r = RdfMapper.serialize(recipe);
+        expect(r).toContain(`_:n3-6 schema:videoURL <http://example.com/Video1>.`);
+        expect(r).toContain(`_:n3-5 a schema:Recipe;`);
+        expect(r).toContain(`schema:recipeName "Cheesecake"^^xsd:string;`);
+        expect(r).toContain(`schema:video _:n3-6.`);
         logResult(SERIALIZE_INTO_BLANK_NODE_ISIRI, r);
     });
 
@@ -329,10 +341,16 @@ describe('Testing basic serialization functions', () => {
         u.name = 'Anton';
         u.address = {streetName: 'St Clair', streetNumber: 223, isRegistered: true};
         const r = RdfMapper.serialize(u);
+        expect(r).toContain(`user:Anton a foaf:User;`);
+        expect(r).toContain(`user:address _:n3-7.`);
+        expect(r).toContain(`_:n3-7 a address:1234;`);
+        expect(r).toContain(`address:streetName "St Clair"^^xsd:string;`);
+        expect(r).toContain(`address:streetNumber "223"^^xsd:integer;`);
+        expect(r).toContain(`address:isRegistered "true"^^xsd:boolean.`);
         logResult(SERIALIZE_JSON_USING_DYNAMIC_SERIALIZER, r);
     });
 
-    it(SERIALIZE_RECURSIVE_TREE, () => {
+    it(SERIALIZE_DESERIALIZE_RECURSIVE_TREE, () => {
         const topNode: SampleTreeNode = new SampleTreeNode();
         topNode.isRoot = true;
         topNode.index = 0;
@@ -346,16 +364,31 @@ describe('Testing basic serialization functions', () => {
         subNodeTwo.index = 1;
         subNodeTwo.label = 'Sub Node 2';
 
-        // const subNodeThree: SampleTreeNode = new SampleTreeNode();
-        // subNodeThree.index = 2;
-        // subNodeThree.label = 'Sub Node 3';
+        const subNodeThree: SampleTreeNode = new SampleTreeNode();
+        subNodeThree.index = 2;
+        subNodeThree.label = 'Sub Node 3';
+
+        const subNodeThreeOne: SampleTreeNode = new SampleTreeNode();
+        subNodeThreeOne.index = 0;
+        subNodeThreeOne.label = 'Sub Node 3.1';
+        subNodeThree.children = [subNodeThreeOne];
 
         // topNode.children = [subNodeOne, subNodeTwo, subNodeThree];
-        topNode._children  = [subNodeOne, subNodeTwo];
+        topNode._children  = [subNodeOne, subNodeTwo, subNodeThree];
 
         const r = RdfMapper.serialize(topNode);
         const deserializedNode: SampleTreeNode = RdfMapper.deserializeTree(SampleTreeNode, r);
-        logResult(SERIALIZE_RECURSIVE_TREE, r, true);
+        expect(deserializedNode instanceof SampleTreeNode).toBeTruthy();
+        expect(deserializedNode instanceof AbstractTreeNode).toBeTruthy();
+        expect(deserializedNode.children.length).toBe(3);
+        expect(deserializedNode.label).toEqual('Top Parent');
+        expect(deserializedNode.index).toEqual(0);
+        expect(deserializedNode.children[0].label).toEqual('Sub Node 1');
+        expect(deserializedNode.children[1].label).toEqual('Sub Node 2');
+        expect(deserializedNode.children[2].label).toEqual('Sub Node 3');
+        expect(deserializedNode.children[2].children.length).toBe(1);
+        expect(deserializedNode.children[2].children[0].label).toEqual('Sub Node 3.1');
+        logResult(SERIALIZE_DESERIALIZE_RECURSIVE_TREE, r, true);
     });
 
 });

@@ -1,4 +1,18 @@
-import {DataFactory, Literal, N3Parser, N3Store, NamedNode, Parser, Prefixes, Quad, Quad_Object, Store, Util} from 'n3';
+import {
+    DataFactory,
+    Literal,
+    N3Parser,
+    N3Store,
+    NamedNode,
+    Parser,
+    Prefixes,
+    Quad,
+    Quad_Object,
+    Quad_Subject,
+    Store,
+    Util
+} from 'n3';
+import {AbstractTreeNode} from '../annotations/interfaces/AbstractTreeNode';
 import {IRdfPrefixes} from '../annotations/interfaces/IRdfPrefixes';
 import {IRdfPropertyMetadata} from '../annotations/interfaces/IRdfPropertyMetadata';
 import {IRdfSubjectMetadata} from '../annotations/interfaces/IRdfSubjectMetadata';
@@ -44,7 +58,7 @@ export class DeserializerProcessor {
         }
     }
 
-    public deserializeTree<T>(type: { new(): T }, ttlData: string): T {
+    public deserializeTree<T extends AbstractTreeNode>(type: { new(): T }, ttlData: string): T {
         let qs: Quad[];
         try {
             qs = this.getQuads(ttlData);
@@ -66,14 +80,15 @@ export class DeserializerProcessor {
         const properties: IRdfPropertyMetadata[] = Reflect.getMetadata('RdfProperty-non-instance', type.prototype);
         const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject-non-instance', type.prototype);
 
-        const numTriples: Quad[] = this.getNumTriplesByBeanType(beanType, store, ns);
-
         const isRootNodeTrue: Literal = this.makeLiteral('true', DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#boolean'));
         const isRootNotePredicate: NamedNode = DataFactory.namedNode('http://ts-rdf-mapper.com#isRootNode');
 
-        const subs = store.getSubjects(isRootNotePredicate, isRootNodeTrue, null);
+        const subs: Quad_Subject[] = store.getSubjects(isRootNotePredicate, isRootNodeTrue, null);
         if (subs.length > 0 ) {
             const rootSubject = subs[0];
+            if (subject) {
+                dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(rootSubject.value, subject.prop, ns);
+            }
             properties.forEach((rdfProp: IRdfPropertyMetadata) => {
                 let objects: Quad_Object[];
                 const rdfPredicateString: string = rdfProp.decoratorMetadata.predicate;

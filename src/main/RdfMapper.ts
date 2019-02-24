@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import {AbstractTreeNode} from './annotations/interfaces/AbstractTreeNode';
 import {DeserializerProcessor} from './processors/DeserializerProcessor';
 import {SerializerProcessor} from './processors/SerializerProcessor';
 
@@ -27,7 +28,7 @@ export class RdfMapper {
         return deserializeProcessor.deserialize(type, ttlData);
     }
 
-    public static deserializeTree<T>(type: { new(): T }, ttlData: string): T {
+    public static deserializeTree<T extends AbstractTreeNode>(type: { new(): T }, ttlData: string): T {
         const deserializeProcessor: DeserializerProcessor = new DeserializerProcessor();
         return deserializeProcessor.deserializeTree(type, ttlData);
     }

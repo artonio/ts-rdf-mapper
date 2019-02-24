@@ -1,3 +1,4 @@
+import {AbstractTreeNode} from '../../main/annotations/interfaces/AbstractTreeNode';
 import {IRDFSerializer} from '../../main/annotations/interfaces/IRDFSerializer';
 import {RdfBean} from '../../main/annotations/RdfBean';
 import {RdfPrefixes} from '../../main/annotations/RdfPrefixes';
@@ -181,18 +182,12 @@ export class MonthWithIRI {
     public days: string[];
 }
 
-export abstract class RDFTreeInterface {
-
-    @RdfProperty({predicate: 'http://ts-rdf-mapper.com#isRootNode', xsdType: XSDDataType.XSD_BOOLEAN})
-    isRoot = false;
-}
-
 @RdfPrefixes({
     foaf: 'http://xmlns.com/foaf/0.1/',
     treeNode: 'http://example.com/treeNode/'
 })
 @RdfBean('foaf:SampleTreeNode')
-export class SampleTreeNode extends RDFTreeInterface {
+export class SampleTreeNode extends AbstractTreeNode {
 
     @RdfProperty({predicate: 'foaf:children', clazz: SampleTreeNode, isArray: true})
     children: SampleTreeNode[];
@@ -200,7 +195,7 @@ export class SampleTreeNode extends RDFTreeInterface {
     @RdfProperty({predicate: 'foaf:label', xsdType: XSDDataType.XSD_STRING})
     label: string;
 
-    // @RdfProperty({predicate: 'foaf:hasNode', clazz: SampleTreeNode, isArray: true})
+    @RdfProperty({predicate: 'foaf:children', clazz: SampleTreeNode, isArray: true})
     set _children(value: SampleTreeNode[]) {
         value.sort((a, b) => {
             return a.index - b.index;
