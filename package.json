@@ -18,6 +18,8 @@
   },
   "keywords": [
     "RDF",
+    "RDF Serializer",
+    "RDF Deserializer",
     "TURTLE",
     "TTL",
     "ObjectMapper"

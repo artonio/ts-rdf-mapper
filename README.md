@@ -119,5 +119,60 @@ _:b1 a foaf:Person;
 ### RdfProperty
 > Used to annotate object properties. Can also be used to annotate typescript setters
 ## Serialize
+Let's take a simple example of Friend Has Friend
+```ts
+@RdfPrefixes({
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    person: 'http://example.com/Person/'
+})
+@RdfBean('foaf:Person')
+export class PersonHasFriend {
+    @RdfSubject('person')
+    public uuid: string;
 
+    @RdfProperty({predicate: 'foaf:name', xsdType: XSDDataType.XSD_STRING})
+    public name: string;
+
+    @RdfProperty({predicate: 'foaf:knows', clazz: PersonHasFriend, inverseOfPredicate: 'foaf:knows'})
+    public knows: PersonHasFriend;
+}
+```
+Let's break it down. First we define prefixes in order to shorten the URI identifiers.
+
+Next we will include an @RdfBean decorator. RdfBean is used to identify the xsd:type of the Resource. 
+This property is optional.
+
+Now onto @RdfSubject decorator. This decorator is used to create an URI identifier for your object. If this decorator is
+absent, the resulting resource will be a blank node. You can pass a namespace prefix name that we defined in @RdfPrefixes
+or a url. The @RdfSubject parameter and the variable value will be concatenated to create a resource identifier.
+
+```ts
+const antonPerson: PersonHasFriend = new PersonHasFriend();
+antonPerson.uuid = 'Anton';
+antonPerson.name = 'Anton S';
+
+const johnDoePerson: PersonHasFriend = new PersonHasFriend();
+johnDoePerson.uuid = 'John';
+johnDoePerson.name = 'John Doe';
+antonPerson.knows = johnDoePerson;
+
+const r = RdfMapper.serialize(antonPerson);
+``` 
+
+which should produce the following TTL (TURTLE) output
+
+```$xslt
+person:John a foaf:Person;
+    foaf:knows person:Anton;
+    foaf:name "John Doe"^^xsd:string.
+person:Anton a foaf:Person;
+    foaf:name "Anton S"^^xsd:string;
+    foaf:knows person:John.
+```
+
+We can see that Anton knows John, but also that John knows Anton even though we did not explicitly specify it.
+
+@RdfProperty has a special inverseOfPredicate property which allows us to point backwards to the previous object.
 ## Deserialize
+
+See deserialize.spec.ts file for more examples

@@ -80,7 +80,7 @@ describe('Testing basic serialization functions', () => {
         expect(b).toContain(`person:height "198.5"^^xsd:long;`);
         expect(b).toContain(`person:buoyancy "53.2"^^xsd:float.`);
 
-        logResult(SERIALIZE_BASIC_TYPES, b, true);
+        logResult(SERIALIZE_BASIC_TYPES, b);
     });
 
     it(SERIALIZE_BASIC_TYPES_CHANGE_VALUE, () => {
@@ -155,18 +155,18 @@ describe('Testing basic serialization functions', () => {
         antonPerson.uuid = 'Anton';
         antonPerson.name = 'Anton S';
 
-        const oscarPerson: PersonHasFriend = new PersonHasFriend();
-        oscarPerson.uuid = 'Oscar';
-        oscarPerson.name = 'Oscar Sisek';
-        antonPerson.knows = oscarPerson;
+        const johnDoePerson: PersonHasFriend = new PersonHasFriend();
+        johnDoePerson.uuid = 'John';
+        johnDoePerson.name = 'John Doe';
+        antonPerson.knows = johnDoePerson;
 
         const r = RdfMapper.serialize(antonPerson);
-        expect(r).toContain(`person:Oscar a foaf:Person;`);
+        expect(r).toContain(`person:John a foaf:Person;`);
         expect(r).toContain(`foaf:knows person:Anton;`);
-        expect(r).toContain(`foaf:name "Oscar Sisek"^^xsd:string.`);
+        expect(r).toContain(`foaf:name "John Doe"^^xsd:string.`);
         expect(r).toContain(`person:Anton a foaf:Person;`);
         expect(r).toContain(`foaf:name "Anton S"^^xsd:string;`);
-        expect(r).toContain(`foaf:knows person:Oscar.`);
+        expect(r).toContain(`foaf:knows person:John.`);
 
         logResult(SERIALIZE_PERSON_HAS_FRIEND, r);
     });
