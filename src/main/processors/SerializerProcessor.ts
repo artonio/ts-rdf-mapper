@@ -34,7 +34,6 @@ export class SerializerProcessor {
 
     constructor() {
         this.prefixes = {xsd: DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#')};
-        // this.n3Writer = N3.Writer();
     }
 
     /**
@@ -46,7 +45,6 @@ export class SerializerProcessor {
         this.process(target);
         this.sortQuads(this.quadsArr);
         this.n3Writer = new Writer({prefixes: this.prefixes});
-        // this.n3Writer.addPrefixes(this.prefixes);
         this.n3Writer.addQuads(this.quadsArr);
         return this.getTTLString();
     }

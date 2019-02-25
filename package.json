@@ -2,7 +2,8 @@
   "name": "ts-rdf-mapper",
   "version": "1.0.0",
   "description": "Object to Turtle mapper",
-  "main": "index.js",
+  "main": "./bin/src/main/index.js",
+  "typings": "./bin/src/main/index.d.ts",
   "scripts": {
     "watch-compile": "node_modules/.bin/tsc -w -p .",
     "build": "node_modules/.bin/tsc -p .",
