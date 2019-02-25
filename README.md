@@ -161,7 +161,7 @@ const r = RdfMapper.serialize(antonPerson);
 
 which should produce the following TTL (TURTLE) output
 
-```$xslt
+```
 person:John a foaf:Person;
     foaf:knows person:Anton;
     foaf:name "John Doe"^^xsd:string.
