@@ -32,7 +32,7 @@ look in test folder for tests
 * Recursive data structures support
 * Inheritance Support
 * Serialize/Deserialize Blank Nodes
-* Serialize/Deserialize plain json objects by extending AbstractBNodeSerializer
+* Serialize plain json objects by extending AbstractBNodeSerializer
 * Written with N3.js with typings provided by DefinitelyTyped
 
 # Examples And Usage
