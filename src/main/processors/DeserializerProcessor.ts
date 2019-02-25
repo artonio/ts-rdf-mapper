@@ -71,7 +71,7 @@ export class DeserializerProcessor {
         }
     }
 
-    private processTree<T>(type: { new(): T }, store: N3Store, object?: Quad_Object): T {
+    private processTree<T extends AbstractTreeNode>(type: { new(): T }, store: N3Store, object?: Quad_Object): T {
         const dtoInstance = new type();
 
         const ns: IRdfPrefixes = Reflect.getMetadata('RdfPrefixes', type.prototype);

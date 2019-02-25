@@ -99,6 +99,6 @@ describe('Test TTL Deserialization', () => {
         expect(template.patientInformation.elements[0].label).toEqual('Demographics');
         expect(template.patientInformation.elements[0].tag).toEqual('demographics');
         const r = RdfMapper.serialize(template);
-        logResult('Deserialize and re-serialize recursive template', r, true);
+        logResult('Deserialize and re-serialize recursive template', r);
     });
 });

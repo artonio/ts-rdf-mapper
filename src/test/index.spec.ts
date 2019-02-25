@@ -64,6 +64,7 @@ describe('Testing basic serialization functions', () => {
         p.gender = 'M';
         p.age = 32;
         p.isAdult = true;
+        p.isChild = false;
         p.weight = 95.5;
         p.height = 198.5;
         p.buoyancy = 53.2;
@@ -74,11 +75,12 @@ describe('Testing basic serialization functions', () => {
         expect(b).toContain(`person:gender "M"^^xsd:string;`);
         expect(b).toContain(`person:age "32"^^xsd:int;`);
         expect(b).toContain(`person:isAdult "true"^^xsd:boolean;`);
+        expect(b).toContain(`person:isChild "false"^^xsd:boolean;`);
         expect(b).toContain(`person:weight "95.5"^^xsd:double;`);
         expect(b).toContain(`person:height "198.5"^^xsd:long;`);
         expect(b).toContain(`person:buoyancy "53.2"^^xsd:float.`);
 
-        logResult(SERIALIZE_BASIC_TYPES, b);
+        logResult(SERIALIZE_BASIC_TYPES, b, true);
     });
 
     it(SERIALIZE_BASIC_TYPES_CHANGE_VALUE, () => {
@@ -351,6 +353,7 @@ describe('Testing basic serialization functions', () => {
 
     it(SERIALIZE_DESERIALIZE_RECURSIVE_TREE, () => {
         const topNode: SampleTreeNode = new SampleTreeNode();
+        topNode.uuid = 'topNode';
         topNode.isRoot = true;
         topNode.index = 0;
         topNode.label = 'Top Parent';

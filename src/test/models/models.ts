@@ -31,6 +31,9 @@ export class PersonMultipleDataTypes {
     @RdfProperty({predicate: 'person:isAdult', xsdType: XSDDataType.XSD_BOOLEAN})
     public isAdult: boolean;
 
+    @RdfProperty({predicate: 'person:isChild', xsdType: XSDDataType.XSD_BOOLEAN})
+    public isChild: boolean;
+
     @RdfProperty({predicate: 'person:weight', xsdType: XSDDataType.XSD_DOUBLE})
     public weight: number;
 
@@ -188,6 +191,9 @@ export class MonthWithIRI {
 })
 @RdfBean('foaf:SampleTreeNode')
 export class SampleTreeNode extends AbstractTreeNode {
+
+    @RdfSubject('foaf')
+    uuid: string;
 
     @RdfProperty({predicate: 'foaf:children', clazz: SampleTreeNode, isArray: true})
     children: SampleTreeNode[];

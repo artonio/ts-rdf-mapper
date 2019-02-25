@@ -23,7 +23,7 @@
     "ObjectMapper"
   ],
   "author": "Anton Sukhovatkin",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/es6-shim": "^0.31.34",
     "@types/jasmine": "~2.5.53",
