@@ -33,7 +33,7 @@ look in test folder for tests
 * Inheritance Support
 * Serialize/Deserialize Blank Nodes
 * Serialize/Deserialize plain json objects by extending AbstractBNodeSerializer
-* Proven javascript library N3.js under the hood
+* Written with N3.js with typings provided by DefinitelyTyped
 
 # Examples And Usage
 ## Decorators
@@ -173,4 +173,4 @@ We can see that Anton knows John, but also that John knows Anton even though we 
 @RdfProperty has a special inverseOfPredicate property which allows us to point backwards to the previous object.
 ## Deserialize
 
-See deserialize.spec.ts file for more examples
+See ```src/test/deserialize.spec.ts``` file for more examples.

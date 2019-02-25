@@ -2,7 +2,6 @@ import {RdfMapper} from '../main/RdfMapper';
 import {Person, personTTL, recipeVideoTTL} from './models/models';
 import {oneToOneRelationship, PersonHasAddress} from './models/oneToOneModels';
 import {Recipe, Video} from './models/recipes';
-import {QaTemplate, QaTemplateElement, templateTTL} from './models/templateModels';
 
 const shouldLogResult = false;
 
@@ -78,27 +77,4 @@ describe('Test TTL Deserialization', () => {
         // console.log(JSON.stringify(recipe));
     });
 
-    it('Deserialize recursive template (async)', async (done) => {
-        const template: QaTemplate = await RdfMapper.deserializeAsync(QaTemplate, templateTTL);
-        expect(template instanceof QaTemplate).toBeTruthy();
-        expect(template.patientInformation instanceof QaTemplateElement).toBeTruthy();
-        expect(template.patientInformation.elements.length).toEqual(2);
-        expect(template.patientInformation.elements[0].index).toEqual(0);
-        expect(template.patientInformation.elements[0].label).toEqual('Demographics');
-        expect(template.patientInformation.elements[0].tag).toEqual('demographics');
-        // console.log(JSON.stringify(template));
-        done();
-    });
-
-    it('Deserialize recursive template',  () => {
-        const template: QaTemplate = RdfMapper.deserialize(QaTemplate, templateTTL);
-        expect(template instanceof QaTemplate).toBeTruthy();
-        expect(template.patientInformation instanceof QaTemplateElement).toBeTruthy();
-        expect(template.patientInformation.elements.length).toEqual(2);
-        expect(template.patientInformation.elements[0].index).toEqual(0);
-        expect(template.patientInformation.elements[0].label).toEqual('Demographics');
-        expect(template.patientInformation.elements[0].tag).toEqual('demographics');
-        const r = RdfMapper.serialize(template);
-        logResult('Deserialize and re-serialize recursive template', r);
-    });
 });
