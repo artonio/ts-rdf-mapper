@@ -142,9 +142,7 @@ Let's break it down. First we define prefixes in order to shorten the URI identi
 Next we will include an @RdfBean decorator. RdfBean is used to identify the xsd:type of the Resource. 
 This property is optional.
 
-Now onto @RdfSubject decorator. This decorator is used to create an URI identifier for your object. If this decorator is
-absent, the resulting resource will be a blank node. You can pass a namespace prefix name that we defined in @RdfPrefixes
-or a url. The @RdfSubject parameter and the variable value will be concatenated to create a resource identifier.
+Now onto @RdfSubject decorator. This decorator is used to create an URI identifier for your object. If this decorator is absent, the resulting resource will be a blank node. You can pass a namespace prefix name that we defined in @RdfPrefixes or a url. The @RdfSubject parameter and the variable value will be concatenated to create a resource identifier.
 
 ```ts
 const antonPerson: PersonHasFriend = new PersonHasFriend();
