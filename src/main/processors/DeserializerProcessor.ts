@@ -31,7 +31,7 @@ export class DeserializerProcessor {
 
     constructor() {}
 
-    public async deserializeAsync<T>(type: { new(): T }, ttlData: string): Promise<T> {
+    public async deserializeAsync<T>(type: { new(): T }, ttlData: string): Promise<T|T[]> {
         let qa: QuadsAndPrefixes;
         try {
             qa = await this.getQuadsAndPrefixes(ttlData);
@@ -45,13 +45,13 @@ export class DeserializerProcessor {
         }
     }
 
-    public deserialize<T>(type: { new(): T }, ttlData: string): T {
+    public deserialize<T>(type: { new(): T }, ttlData: string): T|T[] {
         let qs: Quad[];
         try {
             qs = this.getQuads(ttlData);
             const store: N3Store = new Store();
             store.addQuads(qs);
-            const dtoInstance: T = this.process(type, store);
+            const dtoInstance: T|T[] = this.process(type, store);
             return dtoInstance;
         } catch (e) {
             throw new TurtleParseError(e);
@@ -133,8 +133,7 @@ export class DeserializerProcessor {
         return dtoInstance;
     }
 
-    private process<T>(type: { new(): T }, store: N3Store, object?: Quad_Object): T {
-        const dtoInstance = new type();
+    private process<T>(type: { new(): T }, store: N3Store, object?: Quad_Object): T|T[] {
 
         const ns: IRdfPrefixes = Reflect.getMetadata('RdfPrefixes', type.prototype);
         const beanType: string = Reflect.getMetadata('RdfBean', type.prototype);
@@ -142,8 +141,8 @@ export class DeserializerProcessor {
         const subject: IRdfSubjectMetadata = Reflect.getMetadata('RdfSubject-non-instance', type.prototype);
 
         const numTriples: Quad[] = this.getNumTriplesByBeanType(beanType, store, ns);
-        if (numTriples.length > 0) {
-            const triple: Quad = numTriples[0];
+        const dtoInstances = numTriples.map((triple: Quad) => {
+            const dtoInstance = new type();
             // Get URI and set the value for key which contains @RdfSubject annotation
             if (subject) {
                 dtoInstance[subject.key] = Utils.getUUIDFromResourceSubject(triple.subject.value, subject.prop, ns);
@@ -184,10 +183,14 @@ export class DeserializerProcessor {
                     }
                 }
             });
+            return dtoInstance;
+        })
 
+        if (numTriples.length === 1) {
+            return dtoInstances[0]
+        } else {
+            return dtoInstances
         }
-
-        return dtoInstance;
 
     }
 

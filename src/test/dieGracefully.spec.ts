@@ -16,7 +16,7 @@ function logResult(assertName: string, result: any) {
 describe('Meaningful Exceptions should be thrown', () => {
     it('Should throw TurtleParseError when turtle is invalid', async (done) => {
         try {
-            const instance: Person = await RdfMapper.deserializeAsync(Person, invalidTTL);
+            const instance: Person|Person[] = await RdfMapper.deserializeAsync(Person, invalidTTL);
         } catch (e) {
             expect(e instanceof TurtleParseError).toBeTruthy();
             expect(e.name).toEqual('TurtleParseError');
